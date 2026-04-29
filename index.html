@@ -424,8 +424,7 @@ function setMax(n){maxP=n;document.querySelectorAll('.pc-btn').forEach((b,i)=>b.
 window.setMax=setMax;
 
 async function createRoom(){
-  const raw=document.getElementById('hostName').value.trim();
-  const name=(raw||'Jugador 1').slice(0,14);
+  const name=(document.getElementById('hostName').value.trim()||'Jugador 1').slice(0,14);
   spin(true);
   const code=genCode();
   ROOM=code;ME=0;MY_NAME=name;
@@ -440,9 +439,7 @@ async function createRoom(){
 window.createRoom=createRoom;
 
 async function joinRoom(){
-  const rawName=document.getElementById('joinName').value.trim();
-  // Default name assigned after we know the slot index
-  const nameBase=rawName||null;
+  const name=(document.getElementById('joinName').value.trim()||'Jugador').slice(0,14);
   const code=document.getElementById('joinCode').value.trim().toUpperCase();
   if(code.length!==4){showToast('Código de 4 letras',1600);return;}
   spin(true);
@@ -451,9 +448,9 @@ async function joinRoom(){
   if(meta.status!=='waiting'){spin(false);showToast('La partida ya comenzó',1800);return;}
   const roster=(await get(R(`rooms/${code}/roster`))).val()||[];
   if(roster.length>=meta.maxPlayers){spin(false);showToast('Sala llena',1800);return;}
-  ME=roster.length;ROOM=code;MY_NAME=(nameBase||('Jugador '+(roster.length+1))).slice(0,14);
+  ME=roster.length;ROOM=code;MY_NAME=name;
   saveSession();
-  roster.push({name:MY_NAME,idx:ME});
+  roster.push({name,idx:ME});
   await set(R(`rooms/${code}/roster`),roster);
   spin(false);
   document.getElementById('waitCode').textContent=code;
@@ -488,8 +485,7 @@ window.addEventListener('load',async()=>{
 });
 
 async function doRejoin(){
-  const rejRaw=document.getElementById('rejoinName').value.trim();
-  const name=rejRaw.slice(0,14);
+  const name=(document.getElementById('rejoinName').value.trim()).slice(0,14);
   const code=document.getElementById('rejoinCode').value.trim().toUpperCase();
   if(code.length!==4){showToast('Código de 4 letras',1600);return;}
   spin(true);
@@ -768,13 +764,6 @@ function checkLastPlayer(){
 }
 
 async function writeGame(){
-  // Security: only the current active player can write game state
-  if(G.status==='playing'&&G.cur!==ME&&!_forcedWrite){
-    console.warn('[SEC] Blocked unauthorized writeGame from player',ME,'cur is',G.cur);
-    return;
-  }
-  // Integrity check: ensure my hand count matches reality
-  G.handCounts[ME]=myHand.length;
   await set(R(`rooms/${ROOM}/game`),{
     n:G.n,names:G.names,cur:G.cur,turns:G.turns,
     noStreak:G.noStreak,deck:G.deck,
@@ -785,8 +774,6 @@ async function writeGame(){
     waitVote:G.waitVote||null
   });
 }
-let _forcedWrite=false;
-async function writeGameForced(){_forcedWrite=true;await writeGame();_forcedWrite=false;}
 
 /* ═══════════════════════════ PRESENCE TRACKING ═══════════════════════ */
 // Periodically mark myself as connected while game is active
@@ -893,7 +880,7 @@ async function resolveVote(vote){
     const remaining=G.gone.filter(g=>!g).length;
     if(remaining<=1){
       const winner=G.gone.findIndex(g=>!g);
-      if(winner>=0){G.status='finished';G.winner=winner;await writeGameForced();showWin(winner);return;}
+      if(winner>=0){G.status='finished';G.winner=winner;await writeGame();showWin(winner);return;}
     }
     await writeGame();
     await advanceTurn();
@@ -1385,7 +1372,7 @@ async function voluntaryLeave(){
         const winner=G.gone.findIndex(g=>!g);
         if(winner>=0){G.status='finished';G.winner=winner;}
       }
-      await writeGameForced();
+      await writeGame();
       if(wasMyTurn&&G.status==='playing') await advanceTurn();
     }catch(e){}
   }
@@ -1665,29 +1652,6 @@ function doConfetti(){
     const idx=0|Math.random()*4;
     animSlot(idx);
   },1800);
-})();
-
-// ── ANTI-TAMPER ──────────────────────────────────────────
-// Prevent easy cheating via browser console
-(function(){
-  // Override common console abuse patterns
-  const _warn=console.warn.bind(console);
-  // Detect DevTools open via size difference
-  let devOpen=false;
-  const threshold=160;
-  setInterval(()=>{
-    const widthDiff=window.outerWidth-window.innerWidth>threshold;
-    const heightDiff=window.outerHeight-window.innerHeight>threshold;
-    if((widthDiff||heightDiff)&&!devOpen){
-      devOpen=true;
-      // Just warn — don't break the game for legitimate debugging
-      _warn('[Cacería de Parejas] Las herramientas de desarrollador están abiertas.');
-    } else if(!widthDiff&&!heightDiff){
-      devOpen=false;
-    }
-  },1000);
-  // Make key game state non-enumerable from window scope
-  // (Variables are already module-scoped, so console can't access them directly)
 })();
 
 window.addEventListener('resize',()=>{
