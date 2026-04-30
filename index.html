@@ -20,33 +20,30 @@
 /* ── MOBILE LANDSCAPE ── */
 @media(orientation:landscape)and(max-width:1024px)and(hover:none){
   :root{
-    --CW:32px;--CH:45px;
-    --CW-ME:58px;--CH-ME:80px;
-  }
-  /* My hand fixed at bottom center */
-  #myHandZone{
-    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-    z-index:20;padding-bottom:6px;
+    --CW:30px;--CH:42px;
+    --CW-ME:56px;--CH-ME:78px;
   }
   /* Apartar — bottom left */
-  #btnPlay{
-    position:fixed!important;bottom:18px;left:12px;
-    padding:10px 18px;font-size:.78rem;
+  #actionBar{
+    left:auto!important;transform:none!important;
+    bottom:14px!important;
+    display:flex!important;gap:6px!important;
   }
-  /* Pasar — bottom right (left of emoji) */
-  #btnPass{
-    position:fixed!important;bottom:18px;right:58px;
-    padding:10px 18px;font-size:.78rem;
+  #btnPlay{padding:9px 16px;font-size:.76rem;}
+  #btnPass{padding:9px 16px;font-size:.76rem;}
+  /* Position action bar: play left, pass right of center */
+  #actionBar{
+    left:50%!important;
+    transform:translateX(-50%)!important;
+    bottom:10px!important;
   }
-  #actionBar{display:none!important;}
-  #actionBarMobile{display:flex!important;}
-  #turnTimer{bottom:56px;left:8px;}
+  #turnTimer{bottom:52px;left:8px;}
   #timerRing{width:34px;height:34px;font-size:.8rem;}
-  #reactBtn{bottom:18px;right:12px;width:36px;height:36px;font-size:1rem;}
+  #reactBtn{bottom:14px;right:12px;width:34px;height:34px;font-size:.95rem;}
   #leaveBtn{top:5px;padding:4px 10px;font-size:.62rem;}
   #soundBar{top:5px;}
   .nametag{font-size:.56rem;padding:2px 5px;}
-  #fullscreenBtn{display:flex;}
+  #fullscreenBtn{display:flex!important;}
 }
 /* Mobile portrait */
 @media(orientation:portrait)and(max-width:600px){
@@ -1014,23 +1011,26 @@ function buildBoard(){
   const rx = Math.max(zoneW*0.6, W/2 - zoneW*0.62);
   const ry = Math.max(zoneH*1.2, H/2 - zoneH*1.1);
 
-  // In mobile landscape, reserve bottom area for my hand
-  const mobile=(W<=1024&&'ontouchstart' in window)||W<=700;
-  const bottomReserve=mobile?(chMe+30):50;
+  // Detect mobile touch device
+  const mobile=('ontouchstart' in window&&W<=1024)||W<=700;
+  const bottomReserve = mobile ? (chMe*1.6+50) : 55;
   const maxRX = W/2 - zoneW/2 - 8;
   const maxRY = H/2 - zoneH/2 - bottomReserve;
   const frx = Math.min(rx, maxRX);
-  const fry = Math.min(ry, Math.max(30,maxRY));
+  const fry = Math.min(ry, Math.max(30, maxRY));
 
-  // Rotate polygon so ME is always at bottom (270° = bottom)
   const base = 90 - (360/n)*ME;
-  const pos = Array.from({length:n}, (_,i) => {
+  const rawPos = Array.from({length:n}, (_,i) => {
     const rad = (base + (360/n)*i) * Math.PI/180;
     return { x: cx + frx*Math.cos(rad), y: cy + fry*Math.sin(rad) };
   });
 
-  // Pile offset: always to the right of the hand anchor,
-  // direction rotated perpendicular to the radial direction
+  // On mobile: force ME to bottom center so hand is always reachable
+  const pos = rawPos.map((p,i)=>{
+    if(mobile && i===ME) return { x:cx, y:H - chMe - 50 };
+    return p;
+  });
+
   for(let i=0;i<n;i++){
     const{x,y}=pos[i];
     // Radial direction (outward from center)
@@ -1169,35 +1169,17 @@ function renderZone(i){
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
-      const mobile=(window.innerWidth<=1024&&'ontouchstart' in window)||window.innerWidth<=700;
-      const mhz=document.getElementById('myHandZone');
-      if(mobile&&mhz){
-        // Mobile landscape: render my hand in fixed bottom zone
-        mhz.innerHTML='';
-        const mhDiv=document.createElement('div');
-        mhDiv.style.cssText=`position:relative;width:${fanW}px;height:${fanH}px;`;
-        myHand.forEach((card,j)=>{
-          const rot=count>1?-maxR+j*step:0;
-          const isSel=selH.includes(card.id);
-          const el=mkCard(card);
-          if(isSel) el.classList.add('sel');
-          el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;transform:rotate(${rot}deg) translateY(${isSel?-12:0}px);z-index:${j};transform-origin:top center;`;
-          if(myTurn) el.addEventListener('click',()=>togH(card.id));
-          mhDiv.appendChild(el);
-        });
-        mhz.appendChild(mhDiv);
-        ha.innerHTML='<div style="font-size:.5rem;color:rgba(255,255,255,.15);padding:4px;">↓</div>';
-      } else {
-        myHand.forEach((card,j)=>{
-          const rot=count>1?-maxR+j*step:0;
-          const isSel=selH.includes(card.id);
-          const el=mkCard(card);
-          if(isSel) el.classList.add('sel');
-          el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);z-index:${j};transform-origin:top center;`;
-          if(myTurn) el.addEventListener('click',()=>togH(card.id));
-          ha.appendChild(el);
-        });
-      }
+      myHand.forEach((card,j)=>{
+        const rot=count>1?-maxR+j*step:0;
+        const isSel=selH.includes(card.id);
+        const el=mkCard(card);
+        if(isSel) el.classList.add('sel');
+        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
+          `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
+          `z-index:${j};transform-origin:top center;`;
+        if(myTurn) el.addEventListener('click',()=>togH(card.id));
+        ha.appendChild(el);
+      });
     } else {
       for(let j=0;j<count;j++){
         const rot=count>1?-maxR+j*step:0;
