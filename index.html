@@ -19,31 +19,41 @@
 
 /* ── MOBILE LANDSCAPE ── */
 @media(orientation:landscape)and(max-width:1024px)and(hover:none){
-  :root{
-    --CW:30px;--CH:42px;
-    --CW-ME:56px;--CH-ME:78px;
+  :root{--CW:30px;--CH:42px;--CW-ME:58px;--CH-ME:80px;}
+
+  /* ── MY HAND: fixed bottom strip ── */
+  #mobileHand{
+    display:flex!important;
+    position:fixed;bottom:0;left:0;right:0;
+    height:100px;
+    align-items:flex-end;justify-content:center;
+    padding-bottom:6px;
+    z-index:50;
+    pointer-events:none;
   }
-  /* Apartar — bottom left */
-  #actionBar{
-    left:auto!important;transform:none!important;
-    bottom:14px!important;
-    display:flex!important;gap:6px!important;
+  #mobileHand>*{pointer-events:all;}
+
+  /* ── APARTAR: fixed bottom-left ── */
+  #actionBar{display:none!important;}
+  #btnPlay{
+    display:block!important;position:fixed!important;
+    bottom:12px;left:10px;z-index:60;
+    padding:10px 16px;font-size:.76rem;
   }
-  #btnPlay{padding:9px 16px;font-size:.76rem;}
-  #btnPass{padding:9px 16px;font-size:.76rem;}
-  /* Position action bar: play left, pass right of center */
-  #actionBar{
-    left:50%!important;
-    transform:translateX(-50%)!important;
-    bottom:10px!important;
+  #btnPass{
+    display:block!important;position:fixed!important;
+    bottom:12px;right:52px;z-index:60;
+    padding:10px 16px;font-size:.76rem;
   }
-  #turnTimer{bottom:52px;left:8px;}
-  #timerRing{width:34px;height:34px;font-size:.8rem;}
-  #reactBtn{bottom:14px;right:12px;width:34px;height:34px;font-size:.95rem;}
-  #leaveBtn{top:5px;padding:4px 10px;font-size:.62rem;}
-  #soundBar{top:5px;}
+
+  /* Timer, sound, leave */
+  #turnTimer{bottom:56px;left:8px;}
+  #timerRing{width:32px;height:32px;font-size:.78rem;}
+  #reactBtn{bottom:12px;right:10px;width:34px;height:34px;font-size:.95rem;}
+  #leaveBtn{top:5px;left:5px;padding:4px 10px;font-size:.62rem;}
+  #soundBar{top:5px;right:5px;}
   .nametag{font-size:.56rem;padding:2px 5px;}
-  #fullscreenBtn{display:flex!important;}
+  #fullscreenBtn{display:flex!important;left:auto;right:44px;top:10px;}
 }
 /* Mobile portrait */
 @media(orientation:portrait)and(max-width:600px){
@@ -283,8 +293,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <button class="abtn hi" id="btnPlay" onclick="actPlay()">✓ Apartar</button>
     <button class="abtn"    id="btnPass" onclick="actPass()">→ Pasar</button>
   </div>
-  <!-- Mobile: my hand fixed at bottom -->
-  <div id="myHandZone"></div>
+  <!-- Mobile: my hand fixed at bottom strip -->
+  <div id="mobileHand" style="display:none"></div>
+  <!-- Mobile standalone buttons -->
+  <button class="abtn hi" id="btnPlayM" onclick="actPlay()" style="display:none">✓ Apartar</button>
+  <button class="abtn" id="btnPassM" onclick="actPass()" style="display:none">→ Pasar</button>
   <div id="turnTimer"><div id="timerRing">20</div><div id="timerLabel">TIEMPO</div></div>
   <button id="reactBtn" onclick="toggleReact()">😄</button>
   <div id="reactPanel">
@@ -1025,9 +1038,10 @@ function buildBoard(){
     return { x: cx + frx*Math.cos(rad), y: cy + fry*Math.sin(rad) };
   });
 
-  // On mobile: force ME to bottom center so hand is always reachable
+  // On mobile landscape: push ME zone to top area (hand shows in fixed strip)
+  const isMobL=mobile&&W>H;
   const pos = rawPos.map((p,i)=>{
-    if(mobile && i===ME) return { x:cx, y:H - chMe - 50 };
+    if(isMobL && i===ME) return { x:cx, y: topBar + chMe*0.4 };
     return p;
   });
 
@@ -1083,9 +1097,15 @@ function render(){
   const curDisconnected=!G.connected[G.cur]&&!G.gone[G.cur];
   const myTurn=(G.cur===ME)&&!G.gone[ME]&&!curDisconnected;
   const hasSel=(selH.length+selT.length)>0;
+  const isMobLR=('ontouchstart' in window)&&window.innerWidth>window.innerHeight&&window.innerWidth<=1024;
   document.getElementById('drawBtn').disabled=!myTurn||didDraw||!G.deck.length;
   document.getElementById('btnPlay').disabled=!myTurn||!hasSel;
   document.getElementById('btnPass').disabled=!myTurn||(!didDraw&&!didPlay);
+  // Show/hide mobile standalone buttons
+  const mbp=document.getElementById('btnPlayM');
+  const mbpa=document.getElementById('btnPassM');
+  if(mbp){mbp.style.display=isMobLR?'block':'none';mbp.disabled=!myTurn||!hasSel;}
+  if(mbpa){mbpa.style.display=isMobLR?'block':'none';mbpa.disabled=!myTurn||(!didDraw&&!didPlay);}
   for(let i=0;i<G.n;i++){
     const z=document.getElementById('pz'+i);
     if(z){
@@ -1169,17 +1189,44 @@ function renderZone(i){
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
-      myHand.forEach((card,j)=>{
-        const rot=count>1?-maxR+j*step:0;
-        const isSel=selH.includes(card.id);
-        const el=mkCard(card);
-        if(isSel) el.classList.add('sel');
-        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
-          `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
-          `z-index:${j};transform-origin:top center;`;
-        if(myTurn) el.addEventListener('click',()=>togH(card.id));
-        ha.appendChild(el);
-      });
+      const isMobL=('ontouchstart' in window)&&window.innerWidth>window.innerHeight&&window.innerWidth<=1024;
+      if(isMobL){
+        // Mobile landscape: render hand in fixed bottom strip
+        const mh=document.getElementById('mobileHand');
+        if(mh){
+          mh.innerHTML='';
+          const wrap=document.createElement('div');
+          wrap.style.cssText=`position:relative;width:${fanW}px;height:${fanH}px;`;
+          myHand.forEach((card,j)=>{
+            const rot=count>1?-maxR+j*step:0;
+            const isSel=selH.includes(card.id);
+            const el=mkCard(card);
+            if(isSel) el.classList.add('sel');
+            el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
+              `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
+              `z-index:${j};transform-origin:top center;`;
+            el.addEventListener('click',()=>{if(myTurn)togH(card.id);});
+            wrap.appendChild(el);
+          });
+          mh.appendChild(wrap);
+        }
+        ha.innerHTML=''; // empty the polygon hand zone
+      } else {
+        // Desktop / portrait: render hand in polygon zone normally
+        const mh=document.getElementById('mobileHand');
+        if(mh) mh.innerHTML='';
+        myHand.forEach((card,j)=>{
+          const rot=count>1?-maxR+j*step:0;
+          const isSel=selH.includes(card.id);
+          const el=mkCard(card);
+          if(isSel) el.classList.add('sel');
+          el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
+            `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
+            `z-index:${j};transform-origin:top center;`;
+          if(myTurn) el.addEventListener('click',()=>togH(card.id));
+          ha.appendChild(el);
+        });
+      }
     } else {
       for(let j=0;j<count;j++){
         const rot=count>1?-maxR+j*step:0;
