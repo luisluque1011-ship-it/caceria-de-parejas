@@ -18,7 +18,7 @@
 @media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
 
 /* ── MOBILE LANDSCAPE ── */
-@media(orientation:landscape)and(max-width:900px){
+@media(orientation:landscape)and(max-width:1024px)and(hover:none){
   :root{
     --CW:32px;--CH:45px;
     --CW-ME:58px;--CH-ME:80px;
@@ -1015,7 +1015,7 @@ function buildBoard(){
   const ry = Math.max(zoneH*1.2, H/2 - zoneH*1.1);
 
   // In mobile landscape, reserve bottom area for my hand
-  const mobile=W<=900&&H<W;
+  const mobile=(W<=1024&&'ontouchstart' in window)||W<=700;
   const bottomReserve=mobile?(chMe+30):50;
   const maxRX = W/2 - zoneW/2 - 8;
   const maxRY = H/2 - zoneH/2 - bottomReserve;
@@ -1169,7 +1169,7 @@ function renderZone(i){
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
-      const mobile=window.innerWidth<=900&&window.innerHeight<window.innerWidth;
+      const mobile=(window.innerWidth<=1024&&'ontouchstart' in window)||window.innerWidth<=700;
       const mhz=document.getElementById('myHandZone');
       if(mobile&&mhz){
         // Mobile landscape: render my hand in fixed bottom zone
@@ -1849,7 +1849,7 @@ document.addEventListener('fullscreenchange',()=>{
 function updateFullscreenBtn(){
   const btn=document.getElementById('fullscreenBtn');
   if(!btn) return;
-  const isMobile=window.innerWidth<=900||window.innerHeight<=600;
+  const isMobile=('ontouchstart' in window&&window.innerWidth<=1024)||window.innerWidth<=700;
   btn.style.display=isMobile?'flex':'none';
 }
 window.toggleFullscreen=toggleFullscreen;
