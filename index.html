@@ -2,11 +2,21 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=0.5,maximum-scale=3,user-scalable=yes">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Cacería de Parejas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--felt:#1e6b40;--gold:#d4a83a;--gold2:#f0c96a;--cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;--bg:#0a2318;--txt:#f0e6d2;--CW:62px;--CH:86px;}
+:root{--felt:#1e6b40;--gold:#d4a83a;--gold2:#f0c96a;--cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;--bg:#0a2318;--txt:#f0e6d2;--CW:48px;--CH:67px;}
+@media(min-width:600px){:root{--CW:56px;--CH:78px;}}
+@media(min-width:900px){:root{--CW:62px;--CH:86px;}}
+@media(min-width:1300px){:root{--CW:68px;--CH:94px;}}
+@media(orientation:landscape)and(max-height:520px){:root{--CW:40px;--CH:56px;}
+  #actionBar{bottom:4px;} .abtn{padding:5px 12px;font-size:.7rem;}
+  #turnTimer{bottom:48px;} #timerRing{width:34px;height:34px;font-size:.82rem;}
+  #reactBtn{bottom:4px;width:34px;height:34px;font-size:.95rem;}
+  #leaveBtn{top:4px;padding:4px 10px;font-size:.62rem;}
+  #soundBar{top:4px;} .nametag{font-size:.6rem;padding:3px 7px;}
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--txt);}
 .screen{display:none;position:fixed;inset:0;}
@@ -111,9 +121,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #leaveBtn{position:fixed;top:10px;left:10px;z-index:100;background:rgba(180,40,40,.2);color:#ff7070;border:1.5px solid rgba(180,40,40,.4);padding:6px 14px;border-radius:18px;font-size:.72rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
 #leaveBtn:active{background:rgba(180,40,40,.4);}
 /* SOUND */
-#soundBar{position:fixed;top:10px;right:10px;z-index:100;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border-radius:20px;padding:4px 10px;}
+#soundBar{position:fixed;top:10px;right:10px;z-index:100;display:flex;align-items:center;gap:6px;}
 .snd-btn{background:rgba(0,0,0,.4);border:1px solid rgba(212,168,58,.3);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;}
-#volSlider{-webkit-appearance:none;appearance:none;width:90px;height:5px;border-radius:3px;background:rgba(212,168,58,.3);outline:none;cursor:pointer;}
+#volSlider{-webkit-appearance:none;appearance:none;width:70px;height:4px;border-radius:2px;background:rgba(212,168,58,.3);outline:none;cursor:pointer;}
 #volSlider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;}
 /* FLYING CARD */
 .flyc{position:fixed;z-index:500;pointer-events:none;width:var(--CW);height:var(--CH);border-radius:5px;background:var(--cbg);border:1.5px solid rgba(0,0,0,.12);box-shadow:3px 6px 18px rgba(0,0,0,.5);display:flex;flex-direction:column;justify-content:space-between;padding:2px 3px;font-family:Nunito,sans-serif;font-weight:800;font-size:.66rem;}
@@ -149,21 +159,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .wtitle.winner{font-size:2.2rem;color:#2ecc71;text-shadow:0 0 30px rgba(46,204,113,.5);}
 .wsub{font-size:.95rem;color:rgba(240,230,210,.55);}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:150;}
-/* PORTRAIT WARNING */
-#portraitWarn{display:none;position:fixed;inset:0;z-index:9999;background:#0a2318;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:30px;}
-#portraitWarn.on{display:flex;}
-.pw-icon{font-size:3.5rem;animation:rotate90 1.5s ease-in-out infinite alternate;}
-@keyframes rotate90{0%{transform:rotate(0deg);}100%{transform:rotate(90deg);}}
-.pw-txt{font-family:'Nunito',sans-serif;font-size:1rem;color:rgba(240,230,210,.7);max-width:240px;line-height:1.5;}
-/* Landscape adjustments */
-@media (orientation:landscape) and (max-height:500px){
-  #actionBar{bottom:4px;}
-  #turnTimer{bottom:48px;}
-  #reactBtn{bottom:4px;}
-  #leaveBtn{top:4px;}
-  #soundBar{top:4px;}
-  .abtn{padding:6px 14px;font-size:.72rem;}
-}
 /* SPINNER */
 #spinner{position:fixed;inset:0;background:rgba(10,35,24,.88);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
 #spinner.on{display:flex;}
@@ -220,6 +215,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="player-list" id="waitList"></div>
   <div class="hint-txt" id="waitHint"></div>
   <button class="btn" id="btnStart" style="display:none" onclick="hostStart()">Iniciar Partida</button>
+  <div id="cdWait" style="display:none;font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;color:var(--gold);text-shadow:0 0 30px rgba(212,168,58,.6);"></div>
   <button class="btn-o" onclick="leaveVoluntary()">Salir</button>
 </div>
 
@@ -296,10 +292,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   </div>
 </div>
 
-<div id="portraitWarn">
-  <div class="pw-icon">📱</div>
-  <div class="pw-txt">Gira tu dispositivo a modo <strong>horizontal</strong> para jugar mejor.</div>
-</div>
 <canvas id="confetti"></canvas>
 <div id="toast"></div>
 <div id="spinner"><div class="spin-ring"></div><div style="font-size:.8rem;color:rgba(240,230,210,.4)">Conectando...</div></div>
@@ -358,6 +350,42 @@ let G={
 
 /* ── LISTENERS ──────────────────────────────────────────── */
 let offGame=null,offReact=null,offWait=null;
+let _cdRunning=false;
+
+/* ═══════════════════════════ COUNTDOWN 3-2-1 ═══════════════════════════ */
+function runCountdown(roomData){
+  const btn=document.getElementById('btnStart');
+  const hint=document.getElementById('waitHint');
+  const cdEl=document.getElementById('cdWait');
+  if(btn) btn.style.display='none';
+  if(hint) hint.textContent='';
+  if(cdEl) cdEl.style.display='block';
+
+  let count=3;
+  function tick(){
+    if(cdEl) cdEl.textContent=count;
+    if(count===3||count===2) sndBeep(false);
+    else if(count===1) sndBeep(true);
+
+    if(count<=0){
+      if(cdEl){cdEl.textContent='🎴';sndGo();}
+      setTimeout(()=>{
+        if(cdEl) cdEl.style.display='none';
+        _cdRunning=false;
+        // Detach wait listener and enter game
+        const r=R(`rooms/${ROOM}`);
+        try{off(r);}catch(e){}offWait=null;
+        // Mark as playing so others enter too
+        if(ME===0) set(R(`rooms/${ROOM}/meta/status`),'playing').catch(()=>{});
+        enterGame(roomData);
+      },600);
+      return;
+    }
+    count--;
+    setTimeout(tick,1000);
+  }
+  tick();
+}
 
 /* ── COUNTDOWN STATE ────────────────────────────────────── */
 let cdTimer=null, cdSecs=0;
@@ -377,23 +405,27 @@ const sndDraw=()=>tone(440,'sine',.14,.01,.12);
 const sndFill=(i)=>setTimeout(()=>tone(300+i*30,'triangle',.1,.005,.07),i*80);
 const sndWin=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.18,.01,.25),i*120));
 const sndErr=()=>tone(180,'sawtooth',.08,.005,.13);
+const sndBeep=(high)=>tone(high?880:660,'sine',.22,.005,.18);
+const sndGo=()=>{tone(1046,'sine',.28,.005,.3);setTimeout(()=>tone(1318,'sine',.22,.005,.25),120);}
 const sndPass=()=>{
+  // Golpe sordo de mesa estilo poker — ruido blanco corto + sub-bass
   if(muted) return;
   try{
     const{actx:c,mGain:g}=aud();
     const t=c.currentTime;
-    // Golpe 1 — más fuerte
-    const o1=c.createOscillator(),e1=c.createGain();
-    o1.type='sine';o1.frequency.setValueAtTime(140,t);o1.frequency.exponentialRampToValueAtTime(60,t+0.08);
-    e1.gain.setValueAtTime(0,t);e1.gain.linearRampToValueAtTime(0.4,t+0.005);
-    e1.gain.exponentialRampToValueAtTime(0.001,t+0.18);
-    o1.connect(e1);e1.connect(g);o1.start(t);o1.stop(t+0.2);
-    // Golpe 2 — más suave, 280ms después
-    const o2=c.createOscillator(),e2=c.createGain();
-    o2.type='sine';o2.frequency.setValueAtTime(120,t+0.28);o2.frequency.exponentialRampToValueAtTime(55,t+0.36);
-    e2.gain.setValueAtTime(0,t+0.28);e2.gain.linearRampToValueAtTime(0.28,t+0.285);
-    e2.gain.exponentialRampToValueAtTime(0.001,t+0.46);
-    o2.connect(e2);e2.connect(g);o2.start(t+0.28);o2.stop(t+0.48);
+    // Primer golpe
+    [0, 0.28].forEach((delay,i)=>{
+      const buf=c.createBuffer(1,c.sampleRate*0.08,c.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let k=0;k<d.length;k++) d[k]=(Math.random()*2-1)*Math.pow(1-k/d.length,3);
+      const src=c.createBufferSource();src.buffer=buf;
+      const bp=c.createBiquadFilter();bp.type='lowpass';bp.frequency.value=180;
+      const env=c.createGain();
+      env.gain.setValueAtTime(i===0?.18:.13,t+delay);
+      env.gain.exponentialRampToValueAtTime(0.001,t+delay+0.07);
+      src.connect(bp);bp.connect(env);env.connect(g);
+      src.start(t+delay);src.stop(t+delay+0.08);
+    });
   }catch(e){}
 };
 function toggleMute(){muted=!muted;document.getElementById('muteBtn').textContent=muted?'🔇':'🔊';if(mGain)mGain.gain.value=muted?0:vol;}
@@ -424,12 +456,13 @@ function setMax(n){maxP=n;document.querySelectorAll('.pc-btn').forEach((b,i)=>b.
 window.setMax=setMax;
 
 async function createRoom(){
-  const name=(document.getElementById('hostName').value.trim()||'Jugador 1').slice(0,14);
+  const _hn=document.getElementById('hostName').value.trim();
+  const name=(_hn||'Jugador 1').slice(0,14);
   spin(true);
-  const code=genCode();
+  const code=await genCode();
   ROOM=code;ME=0;MY_NAME=name;
   saveSession();
-  await set(R(`rooms/${code}/meta`),{maxPlayers:maxP,status:'waiting'});
+  await set(R(`rooms/${code}/meta`),{maxPlayers:maxP,status:'waiting',createdAt:Date.now()});
   await set(R(`rooms/${code}/roster`),[{name,idx:0}]);
   spin(false);
   document.getElementById('waitCode').textContent=code;
@@ -439,18 +472,22 @@ async function createRoom(){
 window.createRoom=createRoom;
 
 async function joinRoom(){
-  const name=(document.getElementById('joinName').value.trim()||'Jugador').slice(0,14);
+  const _jn=document.getElementById('joinName').value.trim();
+  // Default name set after knowing slot index
   const code=document.getElementById('joinCode').value.trim().toUpperCase();
   if(code.length!==4){showToast('Código de 4 letras',1600);return;}
   spin(true);
   const meta=(await get(R(`rooms/${code}/meta`))).val();
   if(!meta){spin(false);showToast('Sala no encontrada',1800);return;}
+  const roomAge=Date.now()-(meta.createdAt||0);
+  if(roomAge>5*60*60*1000){spin(false);showToast('Esta sala ya expiró',1800);return;}
   if(meta.status!=='waiting'){spin(false);showToast('La partida ya comenzó',1800);return;}
   const roster=(await get(R(`rooms/${code}/roster`))).val()||[];
   if(roster.length>=meta.maxPlayers){spin(false);showToast('Sala llena',1800);return;}
-  ME=roster.length;ROOM=code;MY_NAME=name;
+  ME=roster.length;ROOM=code;
+  MY_NAME=(_jn||('Jugador '+(roster.length+1))).slice(0,14);
   saveSession();
-  roster.push({name,idx:ME});
+  roster.push({name:MY_NAME,idx:ME});
   await set(R(`rooms/${code}/roster`),roster);
   spin(false);
   document.getElementById('waitCode').textContent=code;
@@ -459,7 +496,20 @@ async function joinRoom(){
 }
 window.joinRoom=joinRoom;
 
-function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ';return Array.from({length:4},()=>c[0|Math.random()*c.length]).join('');}
+async function genCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code,attempts=0;
+  do{
+    code=Array.from({length:4},()=>chars[0|Math.random()*chars.length]).join('');
+    const snap=await get(R(`rooms/${code}/meta`));
+    if(!snap.exists()) break;
+    const meta=snap.val();
+    // Sala expirada (más de 5 horas) → reutilizable
+    if(!meta.createdAt||Date.now()-meta.createdAt>5*60*60*1000) break;
+    attempts++;
+  }while(attempts<10);
+  return code;
+}
 
 /* ═══════════════════════════ SESSION PERSISTENCE ═══════════════════════════ */
 // Save session so player can rejoin after page reload
@@ -559,7 +609,11 @@ function watchWait(){
       btn.style.display='none';
       hint.textContent='Esperando que el anfitrión inicie...';
     }
-    if(data.meta?.status==='playing'&&data.game){
+    if(data.meta?.status==='countdown'&&data.game&&!_cdRunning){
+      _cdRunning=true;
+      runCountdown(data);
+    }
+    if(data.meta?.status==='playing'&&data.game&&!_cdRunning){
       try{off(r);}catch(e){}offWait=null;
       enterGame(data);
     }
@@ -591,7 +645,8 @@ async function hostStart(){
   };
   for(let i=0;i<n;i++) await set(R(`rooms/${ROOM}/hands/${i}`),hands[i]);
   await set(R(`rooms/${ROOM}/game`),game);
-  await set(R(`rooms/${ROOM}/meta/status`),'playing');
+  // Signal countdown to all players
+  await set(R(`rooms/${ROOM}/meta/status`),'countdown');
   spin(false);
 }
 window.hostStart=hostStart;
@@ -898,32 +953,66 @@ function hideVoteUI(){
 
 /* ═══════════════════════════ BUILD BOARD ════════════════════════════ */
 function buildBoard(){
-  // Clean ALL dynamic board elements
   document.querySelectorAll('.pzone,.pzone-pile').forEach(e=>e.remove());
   const board=document.getElementById('sGame');
-  const W=board.offsetWidth,H=board.offsetHeight,n=G.n;
-  const rx=W*0.34,ry=H*0.30,cx=W/2,cy=H/2-10;
-  const base=90-(360/n)*ME;
-  const pos=Array.from({length:n},(_,i)=>{
-    const rad=(base+(360/n)*i)*(Math.PI/180);
-    return{x:cx+rx*Math.cos(rad),y:cy+ry*Math.sin(rad)};
-  });
-  const PILE_DX=200, PILE_DY=-CH/2;
+  const W=board.offsetWidth, H=board.offsetHeight, n=G.n;
+  const cw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
+  const ch=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CH'))||72;
 
+  // Each player zone needs: hand (~10 cards fanned) + gap + pile+nametag
+  // Hand width estimate: spread * (count-1) + cw, capped at 38% screen
+  const handW = Math.min(W*0.38, 9*Math.min(24,100/9)+cw);
+  const pileW = cw + 20;   // pile card + small padding
+  const ntH   = 26;        // nametag height
+  const zoneW = handW + 16 + pileW;   // total zone width
+  const zoneH = ch + ntH + 8;         // total zone height
+
+  // Center of board
+  const cx = W/2, cy = H/2;
+
+  // Polygon radius: leave at least half-zone from edge
+  const rx = Math.max(zoneW*0.6, W/2 - zoneW*0.62);
+  const ry = Math.max(zoneH*1.2, H/2 - zoneH*1.1);
+
+  // Cap radius so nobody goes off-screen
+  const maxRX = W/2 - zoneW/2 - 8;
+  const maxRY = H/2 - zoneH/2 - 50;  // 50 = actionBar space
+  const frx = Math.min(rx, maxRX);
+  const fry = Math.min(ry, maxRY);
+
+  // Rotate polygon so ME is always at bottom (270° = bottom)
+  const base = 90 - (360/n)*ME;
+  const pos = Array.from({length:n}, (_,i) => {
+    const rad = (base + (360/n)*i) * Math.PI/180;
+    return { x: cx + frx*Math.cos(rad), y: cy + fry*Math.sin(rad) };
+  });
+
+  // Pile offset: always to the right of the hand anchor,
+  // direction rotated perpendicular to the radial direction
   for(let i=0;i<n;i++){
     const{x,y}=pos[i];
+    // Radial direction (outward from center)
+    const dx=x-cx, dy=y-cy;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    const nx=dx/len, ny=dy/len;
+    // Perpendicular (clockwise): [ny, -nx]
+    const perpX=ny, perpY=-nx;
+    // Place pile to the side of the hand (always clockwise)
+    const pileGap = handW*0.78 + pileW*0.5 + 40;
+    const px = x + perpX*pileGap;
+    const py = y + perpY*pileGap;
 
-    // ── PILE ZONE (fixed, never moves) ──
+    // ── PILE ZONE ──
     const pd=document.createElement('div');
-    pd.className='pzone-pile';
-    pd.id='pd'+i;
-    pd.style.cssText=`position:absolute;left:${x+PILE_DX}px;top:${y+PILE_DY}px;`+
+    pd.className='pzone-pile'; pd.id='pd'+i;
+    pd.style.cssText=
+      `position:absolute;left:${px}px;top:${py}px;`+
       `transform:translate(-50%,-50%);z-index:5;`+
-      `display:flex;flex-direction:column;align-items:center;gap:5px;`;
+      `display:flex;flex-direction:column;align-items:center;gap:4px;`;
     pd.innerHTML=`<div class="nametag" id="nt${i}"></div><div id="sp${i}"></div>`;
     board.appendChild(pd);
 
-    // ── HAND ZONE (floats freely around anchor) ──
+    // ── HAND ZONE ──
     const z=document.createElement('div');
     z.className='pzone'+(i===ME?' me-zone':'');
     z.id='pz'+i;
@@ -932,16 +1021,15 @@ function buildBoard(){
     board.appendChild(z);
   }
 
-  // Fixed 8-slot table grid
   const grid=document.getElementById('tableGrid');
   grid.innerHTML='';
   for(let i=0;i<8;i++){
     const slot=document.createElement('div');
-    slot.className='tslot';slot.id='ts'+i;
+    slot.className='tslot'; slot.id='ts'+i;
     grid.appendChild(slot);
   }
   const tc=document.getElementById('tCenter');
-  tc.style.cssText=`left:${W/2}px;top:${H/2-10}px;transform:translate(-50%,-50%);`;
+  tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
 }
 
 /* ═══════════════════════════ RENDER ═════════════════════════════════ */
@@ -1008,21 +1096,32 @@ function renderZone(i){
   if(nt){
     const isActive=(i===G.cur&&!G.gone[i]);
     const dot=isActive?'<span class="active-dot"></span>':'';
-    if(G.gone[i])       nt.innerHTML='<span style="color:#888;font-style:italic">'+G.names[i]+'</span>';
+    if(G.gone[i])       nt.innerHTML=G.names[i]+' 🚪';
     else if(!G.connected[i]) nt.innerHTML=G.names[i]+' 📵'+dot;
     else                nt.innerHTML=G.names[i]+(i===ME?' 👤':'')+dot;
   }
 
+  const cw_r=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
+  const ch_r=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CH'))||72;
   const count=isMe?myHand.length:(G.handCounts[i]||0);
+  const sw=document.getElementById('sGame').offsetWidth;
+  // My hand: up to 38% of screen; others: up to 22%
+  const maxFanW=isMe?sw*0.46:sw*0.28;
   if(!count){
     ha.innerHTML='<div style="font-size:.55rem;color:rgba(255,255,255,.22);padding:8px 4px;text-align:center;">Sin<br>cartas</div>';
   } else {
-    const maxR=Math.min(26,count*2);
+    const maxR=Math.min(22,count*1.8);
     const step=count>1?(maxR*2)/(count-1):0;
-    const spread=Math.min(32,150/Math.max(count-1,1));
-    const totalW=(count-1)*spread+CW;
-    const fanW=Math.max(totalW+8,160);
-    const fanH=CH+Math.abs(Math.sin(maxR*Math.PI/180))*totalW*0.45+14;
+    // Spread: natural spacing but capped so fan never exceeds maxFanW
+    const naturalSpread=Math.min(36,160/Math.max(count-1,1));
+    const naturalTotal=(count-1)*naturalSpread+cw_r;
+    const spreadScale=naturalTotal>maxFanW
+      ? Math.max(0.3,(maxFanW-cw_r)/Math.max(count-1,1)/naturalSpread)
+      : 1;
+    const spread=naturalSpread*spreadScale;
+    const totalW=(count-1)*spread+cw_r;
+    const fanW=totalW+8;
+    const fanH=ch_r+Math.abs(Math.sin(maxR*Math.PI/180))*totalW*0.38+14;
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
@@ -1039,7 +1138,7 @@ function renderZone(i){
       for(let j=0;j<count;j++){
         const rot=count>1?-maxR+j*step:0;
         const el=document.createElement('div');el.className='cback';
-        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;width:${CW}px;height:${CH}px;transform:rotate(${rot}deg);z-index:${j};transform-origin:top center;`;
+        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;width:${cw_r}px;height:${ch_r}px;transform:rotate(${rot}deg);z-index:${j};transform-origin:top center;`;
         ha.appendChild(el);
       }
     }
@@ -1129,8 +1228,9 @@ function actDraw(){
   const deckEl=document.querySelector('#sharedDeck .dstack');
   const haEl=document.getElementById('ha'+ME);
   const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+  const _dcw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
   let ex=dr.left,ey=dr.top;
-  if(haEl){const hr=haEl.getBoundingClientRect();ex=hr.left+hr.width/2-CW/2;ey=hr.top+4;}
+  if(haEl){const hr=haEl.getBoundingClientRect();ex=hr.left+hr.width/2-_dcw/2;ey=hr.top+4;}
   // Publish draw event immediately for others to see
   pushAnimEvent('fly_draw',{card,targetIdx:ME}).catch(()=>{});
   const fly=mkFly(card,dr.left,dr.top);
@@ -1170,8 +1270,10 @@ function execPlay(hc,tc,targetPileIdx,pileEl,onMsg){
     const r=el?el.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
     return{card:c,sx:r.left,sy:r.top};
   });
+  const _ecw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
+  const _ech=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CH'))||72;
   const pr=pileEl?pileEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-  const ex=pr.left+pr.width/2-CW/2,ey=pr.top+pr.height/2-CH/2;
+  const ex=pr.left+pr.width/2-_ecw/2,ey=pr.top+pr.height/2-_ech/2;
   // DO NOT hide originals yet — the flying card IS the original card visually
   const board=document.getElementById('sGame');
 
@@ -1375,6 +1477,10 @@ async function voluntaryLeave(){
       await writeGame();
       if(wasMyTurn&&G.status==='playing') await advanceTurn();
     }catch(e){}
+  }
+  // If host leaves, mark room as abandoned so others know
+  if(ME===0&&ROOM){
+    try{await set(R(`rooms/${ROOM}/meta/status`),'abandoned');}catch(e){}
   }
   clearSession();
   detachListeners();
@@ -1654,25 +1760,7 @@ function doConfetti(){
   },1800);
 })();
 
-window.addEventListener('resize',()=>{
-  checkOrientation();
-  if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}
-});
-window.addEventListener('orientationchange',()=>{
-  setTimeout(()=>{
-    checkOrientation();
-    if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}
-  },300);
-});
-function checkOrientation(){
-  const warn=document.getElementById('portraitWarn');
-  if(!warn) return;
-  // Show warning only on small screens in portrait while game is active
-  const isMobile=window.innerWidth<=900&&window.innerHeight<=900;
-  const isPortrait=window.innerHeight>window.innerWidth;
-  const gameActive=document.getElementById('sGame').classList.contains('active');
-  warn.classList.toggle('on', isMobile&&isPortrait&&gameActive);
-}
+window.addEventListener('resize',()=>{if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}});
 </script>
 </body>
 </html>
