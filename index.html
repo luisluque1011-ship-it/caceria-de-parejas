@@ -2,20 +2,40 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes">
 <title>Cacería de Parejas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--felt:#1e6b40;--gold:#d4a83a;--gold2:#f0c96a;--cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;--bg:#0a2318;--txt:#f0e6d2;--CW:48px;--CH:67px;}
-@media(min-width:600px){:root{--CW:56px;--CH:78px;}}
-@media(min-width:900px){:root{--CW:62px;--CH:86px;}}
-@media(min-width:1300px){:root{--CW:68px;--CH:94px;}}
-@media(orientation:landscape)and(max-height:520px){:root{--CW:40px;--CH:56px;}
-  #actionBar{bottom:4px;} .abtn{padding:5px 12px;font-size:.7rem;}
-  #turnTimer{bottom:48px;} #timerRing{width:34px;height:34px;font-size:.82rem;}
-  #reactBtn{bottom:4px;width:34px;height:34px;font-size:.95rem;}
-  #leaveBtn{top:4px;padding:4px 10px;font-size:.62rem;}
-  #soundBar{top:4px;} .nametag{font-size:.6rem;padding:3px 7px;}
+:root{
+  --felt:#1e6b40;--gold:#d4a83a;--gold2:#f0c96a;
+  --cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;
+  --bg:#0a2318;--txt:#f0e6d2;
+  --CW:52px;--CH:72px;
+  --CW-ME:52px;--CH-ME:72px; /* my hand size = same on desktop */
+}
+/* Desktop / large screens — keep original sizes */
+@media(min-width:900px){:root{--CW:62px;--CH:86px;--CW-ME:62px;--CH-ME:86px;}}
+@media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
+
+/* ── MOBILE LANDSCAPE ── */
+@media(orientation:landscape)and(max-width:900px){
+  :root{
+    --CW:34px;--CH:48px;       /* other players small */
+    --CW-ME:54px;--CH-ME:76px; /* my hand bigger */
+  }
+  #actionBar{bottom:5px;}
+  .abtn{padding:6px 14px;font-size:.72rem;}
+  #turnTimer{bottom:52px;left:8px;}
+  #timerRing{width:36px;height:36px;font-size:.82rem;}
+  #reactBtn{bottom:5px;width:36px;height:36px;font-size:1rem;}
+  #leaveBtn{top:5px;padding:4px 10px;font-size:.62rem;}
+  #soundBar{top:5px;}
+  .nametag{font-size:.58rem;padding:2px 6px;}
+  #fullscreenBtn{display:flex;}
+}
+/* Mobile portrait */
+@media(orientation:portrait)and(max-width:600px){
+  :root{--CW:44px;--CH:62px;--CW-ME:44px;--CH-ME:62px;}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--txt);}
@@ -233,6 +253,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 <!-- JUEGO -->
 <div id="sGame" class="screen">
   <button id="leaveBtn" onclick="confirmLeave()">🚪 Salir</button>
+  <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Pantalla completa" style="display:none;position:fixed;top:10px;left:90px;z-index:100;background:rgba(0,0,0,.4);border:1px solid rgba(212,168,58,.35);border-radius:50%;width:32px;height:32px;font-size:.9rem;cursor:pointer;align-items:center;justify-content:center;color:var(--gold);">⛶</button>
   <div id="soundBar">
     <div class="snd-btn" id="muteBtn" onclick="toggleMute()">🔊</div>
     <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.5" oninput="setVol(this.value)">
@@ -566,7 +587,7 @@ async function doRejoin(){
   spin(false);
   applyGame(gameData);
   goTo('sGame');
-  requestAnimationFrame(()=>{buildBoard();render();showToast('¡Reconectado! 🔌',1600);startTurnTimer();});
+  requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();showToast('¡Reconectado! 🔌',1600);startTurnTimer();});
   watchGame();watchReactions();watchEvents();
   // Mark online in presence
   markPresence(true);
@@ -657,8 +678,8 @@ async function enterGame(roomData){
   myHand=sortCards(roomData.hands?.[ME]||[]);
   selH=[];selT=[];didDraw=false;didPlay=false;
   goTo('sGame');
-  requestAnimationFrame(()=>{buildBoard();render();if(G.cur===ME) showToast('¡Tu turno! 🎴',1800);
-    else showToast(`Turno de ${G.names[G.cur]}`,1800);});
+  requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();if(G.cur===ME) showToast('¡Tu turno! 🎴',1800);
+    else showToast(`Turno de ${G.names[G.cur]}`,1800);startTurnTimer();});
   watchGame();watchReactions();watchEvents();
   markPresence(true);
   startTurnTimer();
@@ -956,12 +977,14 @@ function buildBoard(){
   document.querySelectorAll('.pzone,.pzone-pile').forEach(e=>e.remove());
   const board=document.getElementById('sGame');
   const W=board.offsetWidth, H=board.offsetHeight, n=G.n;
-  const cw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
-  const ch=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CH'))||72;
+  const bcs=getComputedStyle(document.documentElement);
+  const cw=parseInt(bcs.getPropertyValue('--CW'))||52;
+  const ch=parseInt(bcs.getPropertyValue('--CH'))||72;
+  const cwMe=parseInt(bcs.getPropertyValue('--CW-ME'))||cw;
+  const chMe=parseInt(bcs.getPropertyValue('--CH-ME'))||ch;
 
-  // Each player zone needs: hand (~10 cards fanned) + gap + pile+nametag
-  // Hand width estimate: spread * (count-1) + cw, capped at 38% screen
-  const handW = Math.min(W*0.38, 9*Math.min(24,100/9)+cw);
+  // My hand is wider (bigger cards), others are smaller
+  const handW = Math.min(W*0.42, 9*Math.min(28,130/9)+cwMe);
   const pileW = cw + 20;   // pile card + small padding
   const ntH   = 26;        // nametag height
   const zoneW = handW + 16 + pileW;   // total zone width
@@ -1101,12 +1124,14 @@ function renderZone(i){
     else                nt.innerHTML=G.names[i]+(i===ME?' 👤':'')+dot;
   }
 
-  const cw_r=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
-  const ch_r=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CH'))||72;
+  const cs=getComputedStyle(document.documentElement);
+  const cw_r=parseInt(isMe?cs.getPropertyValue('--CW-ME'):cs.getPropertyValue('--CW'))||52;
+  const ch_r=parseInt(isMe?cs.getPropertyValue('--CH-ME'):cs.getPropertyValue('--CH'))||72;
   const count=isMe?myHand.length:(G.handCounts[i]||0);
   const sw=document.getElementById('sGame').offsetWidth;
-  // My hand: up to 38% of screen; others: up to 22%
-  const maxFanW=isMe?sw*0.46:sw*0.28;
+  const sh=document.getElementById('sGame').offsetHeight;
+  // My hand takes more space, others less — especially on mobile
+  const maxFanW=isMe?Math.min(sw*0.52,sw-120):sw*0.24;
   if(!count){
     ha.innerHTML='<div style="font-size:.55rem;color:rgba(255,255,255,.22);padding:8px 4px;text-align:center;">Sin<br>cartas</div>';
   } else {
@@ -1760,7 +1785,31 @@ function doConfetti(){
   },1800);
 })();
 
-window.addEventListener('resize',()=>{if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}});
+function toggleFullscreen(){
+  const btn=document.getElementById('fullscreenBtn');
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+    if(btn) btn.textContent='⛶';
+  } else {
+    document.exitFullscreen().catch(()=>{});
+    if(btn) btn.textContent='⛶';
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const btn=document.getElementById('fullscreenBtn');
+  if(btn) btn.textContent=document.fullscreenElement?'✕':'⛶';
+});
+// Show fullscreen btn only on mobile
+function updateFullscreenBtn(){
+  const btn=document.getElementById('fullscreenBtn');
+  if(!btn) return;
+  const isMobile=window.innerWidth<=900||window.innerHeight<=600;
+  btn.style.display=isMobile?'flex':'none';
+}
+window.toggleFullscreen=toggleFullscreen;
+
+window.addEventListener('resize',()=>{
+  updateFullscreenBtn();if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}});
 </script>
 </body>
 </html>
