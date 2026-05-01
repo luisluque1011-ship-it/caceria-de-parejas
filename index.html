@@ -18,38 +18,68 @@
 @media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
 
 /* ── MOBILE LANDSCAPE: clases aplicadas por JS ── */
-/* Estas clases se añaden a body cuando isMobLandscape()===true */
-body.mob-land{--CW:28px;--CH:39px;--CW-ME:56px;--CH-ME:78px;}
+body.mob-land{
+  --CW:32px;--CH:45px;       /* cartas mesa/otros: medianas */
+  --CW-ME:58px;--CH-ME:80px; /* mis cartas: grandes */
+  --MOB-H:110px;             /* altura franja inferior */
+}
+/* Franja inferior: fondo igual al tablero, sin división visible */
 body.mob-land #mobileHand{
-  display:flex!important;position:fixed;
-  bottom:0;left:0;right:0;height:98px;
-  background:rgba(0,0,0,.22);
-  border-top:1px solid rgba(212,168,58,.18);
+  display:flex!important;
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--MOB-H);
+  background:var(--felt);  /* mismo verde que el tablero */
   align-items:center;justify-content:center;
   z-index:50;overflow:visible;
+  border-top:1px solid rgba(255,255,255,.06);
 }
-body.mob-land #sGame{padding-bottom:98px;}
+/* Tablero: dejar espacio para mi mano */
+body.mob-land #sGame{padding-bottom:var(--MOB-H);}
+/* Ocultar actionBar original */
 body.mob-land #actionBar{display:none!important;}
+/* Apartar — izquierda */
 body.mob-land #btnPlay{
   display:flex!important;align-items:center;
-  position:fixed!important;bottom:31px;left:8px;
-  z-index:60;padding:8px 14px;font-size:.72rem;border-radius:18px;
+  position:fixed!important;
+  bottom:calc(var(--MOB-H)/2 - 16px);left:8px;
+  z-index:60;padding:9px 14px;font-size:.72rem;border-radius:20px;
+  background:rgba(212,168,58,.18);color:var(--gold);
+  border:1.5px solid rgba(212,168,58,.5);
+  font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;
 }
+body.mob-land #btnPlay:disabled{opacity:.3;cursor:not-allowed;}
+/* Pasar — derecha */
 body.mob-land #btnPass{
   display:flex!important;align-items:center;
-  position:fixed!important;bottom:31px;right:52px;
-  z-index:60;padding:8px 14px;font-size:.72rem;border-radius:18px;
+  position:fixed!important;
+  bottom:calc(var(--MOB-H)/2 - 16px);right:52px;
+  z-index:60;padding:9px 14px;font-size:.72rem;border-radius:20px;
+  background:rgba(0,0,0,.4);color:var(--gold);
+  border:1.5px solid rgba(212,168,58,.4);
+  font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;
 }
-body.mob-land #turnTimer{bottom:102px;left:8px;}
+body.mob-land #btnPass:disabled{opacity:.3;cursor:not-allowed;}
+/* Timer */
+body.mob-land #turnTimer{bottom:calc(var(--MOB-H)+4px);left:8px;}
 body.mob-land #timerRing{width:30px;height:30px;font-size:.75rem;}
-body.mob-land #reactBtn{bottom:31px;right:8px;width:36px;height:36px;}
-body.mob-land #reactPanel{bottom:102px;}
-body.mob-land #leaveBtn{top:4px;padding:4px 9px;font-size:.6rem;}
+body.mob-land #timerLabel{font-size:.44rem;}
+/* Emoji */
+body.mob-land #reactBtn{
+  bottom:calc(var(--MOB-H)/2 - 18px);right:8px;
+  width:36px;height:36px;font-size:.95rem;
+}
+body.mob-land #reactPanel{bottom:calc(var(--MOB-H)+4px);}
+/* UI corners */
+body.mob-land #leaveBtn{top:4px;left:4px;padding:4px 9px;font-size:.6rem;}
 body.mob-land #soundBar{top:4px;right:4px;}
-body.mob-land #volSlider{width:55px;}
-body.mob-land #drawBtn{padding:3px 8px;font-size:.62rem;}
-body.mob-land .nametag{font-size:.54rem;padding:2px 5px;}
-body.mob-land #fullscreenBtn{display:flex!important;top:4px;right:38px;}
+body.mob-land #volSlider{width:50px;}
+body.mob-land #drawBtn{padding:3px 8px;font-size:.6rem;}
+body.mob-land .nametag{font-size:.54rem;padding:2px 6px;}
+body.mob-land #fullscreenBtn{display:flex!important;top:4px;right:36px;}
+/* Cartas de mesa más grandes en móvil */
+body.mob-land #tableGrid{gap:4px;}
+body.mob-land .tslot{width:var(--CW);height:calc(var(--CH)+10px);}
+body.mob-land .tslot-empty{width:var(--CW);height:var(--CH);}
 /* Mobile portrait */
 @media(orientation:portrait)and(max-width:600px){
   :root{--CW:44px;--CH:62px;--CW-ME:44px;--CH-ME:62px;}
@@ -1063,7 +1093,8 @@ function buildBoard(){
       slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
     }
     const tc=document.getElementById('tCenter');
-    tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
+    // Center table in middle of usable area
+    tc.style.cssText=`left:${cx}px;top:${areaH*0.52}px;transform:translate(-50%,-50%);`;
 
     // Otros jugadores (todos excepto ME)
     const others=Array.from({length:n},(_,i)=>i).filter(i=>i!==ME);
@@ -1101,10 +1132,10 @@ function buildBoard(){
       placeZone(pi, op.x, op.y, op.x+cw*1.6, op.y);
     });
 
-    // ME: pile shown top-center (hand is in fixed strip below)
-    // Just need the pile zone for ME
-    const mePileX=W*0.88, mePileY=areaH*0.5;
-    placeZone(ME, cx, areaH*0.5, mePileX, mePileY);
+    // ME: hand zone invisible (hand in fixed strip), pile bottom-right
+    // Pile close to the hand strip for easy visual connection
+    const mePileX=W*0.82, mePileY=areaH*0.72;
+    placeZone(ME, cx, areaH*0.85, mePileX, mePileY);
 
   } else {
     // ══════════════════════════════════════════════════════════════
@@ -1274,28 +1305,26 @@ function renderZone(i){
         myHand.forEach((card,j)=>{
           const rot=cnt>1?-mMaxR+j*mStep:0;
           const isSel=selH.includes(card.id);
-          // Crear carta con tamaño de mi mano (usa --CW-ME via CSS)
-          const el=document.createElement('div');
-          el.className='card-me '+(isRed(card)?'red':'black');
-          el.dataset.id=card.id;
-          el.style.cssText=
-            `width:${meCW}px;height:${meCH}px;background:var(--cbg);`+
-            `border-radius:5px;border:1.5px solid rgba(0,0,0,.12);`+
-            `box-shadow:1px 2px 6px rgba(0,0,0,.28);position:absolute;`+
-            `display:flex;flex-direction:column;justify-content:space-between;`+
-            `padding:2px 3px;flex-shrink:0;cursor:pointer;user-select:none;`+
-            `left:${mStartX+j*mSpread}px;top:0;`+
-            `transform:rotate(${rot}deg) translateY(${isSel?-12:0}px);`+
-            `z-index:${j};transform-origin:top center;`+
-            (isSel?`box-shadow:0 0 0 2.5px var(--gold),0 -6px 16px rgba(212,168,58,.35);border-color:var(--gold);`:'');
-          el.innerHTML=
-            `<div style="font-size:.82rem;font-weight:800;line-height:1.15;">${card.v}<br>`+
-            `<span style="font-size:.8em">${card.s}</span></div>`+
-            `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);`+
-            `font-size:1.5rem;pointer-events:none;">${card.s}</div>`+
-            `<div style="font-size:.82rem;font-weight:800;line-height:1.15;`+
-            `transform:rotate(180deg);align-self:flex-end;">${card.v}<br>`+
-            `<span style="font-size:.8em">${card.s}</span></div>`;
+          // Usar mkCard() — mismos estilos que en desktop, tamaño forzado via inline
+          const el=mkCard(card);
+          el.style.width=meCW+'px';
+          el.style.height=meCH+'px';
+          el.style.position='absolute';
+          el.style.left=(mStartX+j*mSpread)+'px';
+          el.style.top='0';
+          el.style.transform=`rotate(${rot}deg) translateY(${isSel?-14:0}px)`;
+          el.style.zIndex=j;
+          el.style.transformOrigin='top center';
+          el.style.fontSize='.82rem';
+          if(isSel){
+            el.style.boxShadow='0 0 0 2.5px var(--gold),0 -6px 16px rgba(212,168,58,.35)';
+            el.style.borderColor='var(--gold)';
+          }
+          // Update inner font sizes for bigger card
+          const cts=el.querySelectorAll('.ct,.cb');
+          cts.forEach(c=>{c.style.fontSize='.84rem';});
+          const cs=el.querySelector('.cs');
+          if(cs) cs.style.fontSize='1.55rem';
           el.addEventListener('click',()=>{if(myTurn)togH(card.id);});
           wrap.appendChild(el);
         });
