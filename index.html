@@ -17,90 +17,39 @@
 @media(min-width:900px){:root{--CW:62px;--CH:86px;--CW-ME:62px;--CH-ME:86px;}}
 @media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
 
-/* ══════════════════════════════════════════
-   MOBILE LANDSCAPE — layout completamente nuevo
-   ══════════════════════════════════════════ */
-@media(orientation:landscape)and(max-width:1024px)and(hover:none){
-
-  /* Tamaños de carta */
-  :root{
-    --CW:28px;--CH:39px;      /* otros jugadores: pequeño */
-    --CW-ME:56px;--CH-ME:78px; /* mi mano: grande */
-    --MOB-HAND-H:98px;         /* altura del strip de mi mano */
-  }
-
-  /* ── LAYOUT: 3 franjas horizontales fijas ──
-     TOP (altura dinámica): jugadores + mesa
-     BOTTOM (98px): mi mano
-  */
-
-  /* Fondo del tablero: dejar espacio abajo para mi mano */
-  #sGame{padding-bottom:var(--MOB-HAND-H);}
-
-  /* ── MI MANO: franja fija inferior ── */
-  #mobileHand{
-    display:flex!important;
-    position:fixed;
-    bottom:0;left:0;right:0;
-    height:var(--MOB-HAND-H);
-    background:rgba(0,0,0,.18);
-    border-top:1px solid rgba(212,168,58,.15);
-    align-items:center;
-    justify-content:center;
-    z-index:50;
-    overflow:hidden;
-  }
-
-  /* ── APARTAR: izquierda, centrado verticalmente en la franja ── */
-  #actionBar{display:none!important;}
-  #btnPlay{
-    display:flex!important;
-    align-items:center;
-    position:fixed!important;
-    bottom:calc(var(--MOB-HAND-H)/2 - 18px);
-    left:8px;
-    z-index:60;
-    padding:8px 12px;
-    font-size:.7rem;
-    border-radius:18px;
-  }
-  /* ── PASAR: derecha, centrado verticalmente ── */
-  #btnPass{
-    display:flex!important;
-    align-items:center;
-    position:fixed!important;
-    bottom:calc(var(--MOB-HAND-H)/2 - 18px);
-    right:50px;
-    z-index:60;
-    padding:8px 12px;
-    font-size:.7rem;
-    border-radius:18px;
-  }
-
-  /* ── UI ELEMENTS ── */
-  #turnTimer{
-    position:fixed;
-    bottom:calc(var(--MOB-HAND-H) + 4px);
-    left:8px;z-index:100;
-  }
-  #timerRing{width:30px;height:30px;font-size:.75rem;border-width:2px;}
-  #timerLabel{font-size:.46rem;}
-  #reactBtn{
-    bottom:calc(var(--MOB-HAND-H)/2 - 17px);
-    right:8px;width:34px;height:34px;font-size:.9rem;
-  }
-  #reactPanel{bottom:calc(var(--MOB-HAND-H) + 4px);}
-  #leaveBtn{top:4px;left:4px;padding:4px 9px;font-size:.6rem;}
-  #soundBar{top:4px;right:4px;}
-  #volSlider{width:55px;}
-  #fullscreenBtn{
-    display:flex!important;
-    top:4px;left:auto;right:40px;
-  }
-  .nametag{font-size:.54rem;padding:2px 5px;letter-spacing:0;}
-  /* Robar: más compacto */
-  #drawBtn{padding:3px 8px;font-size:.62rem;}
+/* ── MOBILE LANDSCAPE: clases aplicadas por JS ── */
+/* Estas clases se añaden a body cuando isMobLandscape()===true */
+body.mob-land{--CW:28px;--CH:39px;--CW-ME:56px;--CH-ME:78px;}
+body.mob-land #mobileHand{
+  display:flex!important;position:fixed;
+  bottom:0;left:0;right:0;height:98px;
+  background:rgba(0,0,0,.22);
+  border-top:1px solid rgba(212,168,58,.18);
+  align-items:center;justify-content:center;
+  z-index:50;overflow:visible;
 }
+body.mob-land #sGame{padding-bottom:98px;}
+body.mob-land #actionBar{display:none!important;}
+body.mob-land #btnPlay{
+  display:flex!important;align-items:center;
+  position:fixed!important;bottom:31px;left:8px;
+  z-index:60;padding:8px 14px;font-size:.72rem;border-radius:18px;
+}
+body.mob-land #btnPass{
+  display:flex!important;align-items:center;
+  position:fixed!important;bottom:31px;right:52px;
+  z-index:60;padding:8px 14px;font-size:.72rem;border-radius:18px;
+}
+body.mob-land #turnTimer{bottom:102px;left:8px;}
+body.mob-land #timerRing{width:30px;height:30px;font-size:.75rem;}
+body.mob-land #reactBtn{bottom:31px;right:8px;width:36px;height:36px;}
+body.mob-land #reactPanel{bottom:102px;}
+body.mob-land #leaveBtn{top:4px;padding:4px 9px;font-size:.6rem;}
+body.mob-land #soundBar{top:4px;right:4px;}
+body.mob-land #volSlider{width:55px;}
+body.mob-land #drawBtn{padding:3px 8px;font-size:.62rem;}
+body.mob-land .nametag{font-size:.54rem;padding:2px 5px;}
+body.mob-land #fullscreenBtn{display:flex!important;top:4px;right:38px;}
 /* Mobile portrait */
 @media(orientation:portrait)and(max-width:600px){
   :root{--CW:44px;--CH:62px;--CW-ME:44px;--CH-ME:62px;}
@@ -537,6 +486,26 @@ function sortCards(h){return[...h].sort((a,b)=>ORDER[a.v]-ORDER[b.v]);}
 const isRed=c=>RED.has(c.s);
 const uid=()=>Math.random().toString(36).substr(2,9);
 
+/* ── MOBILE DETECTION (JS-based, reliable on all devices) ── */
+function isMobLandscape(){
+  // Detect by screen size + touch + orientation
+  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+  const isLandscape=window.innerWidth>window.innerHeight;
+  const isSmall=window.innerWidth<=1024;
+  return isTouch&&isLandscape&&isSmall;
+}
+
+function applyMobileClass(){
+  if(isMobLandscape()){
+    document.body.classList.add('mob-land');
+  } else {
+    document.body.classList.remove('mob-land');
+    // Clear mobile hand when not in landscape
+    const mh=document.getElementById('mobileHand');
+    if(mh) mh.innerHTML='';
+  }
+}
+
 /* ═══════════════════════════ UI HELPERS ═══════════════════════════ */
 function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function spin(on){document.getElementById('spinner').classList.toggle('on',on);}
@@ -659,6 +628,7 @@ async function doRejoin(){
 
   spin(false);
   applyGame(gameData);
+  applyMobileClass();
   goTo('sGame');
   requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();showToast('¡Reconectado! 🔌',1600);startTurnTimer();});
   watchGame();watchReactions();watchEvents();
@@ -750,6 +720,7 @@ async function enterGame(roomData){
   applyGame(roomData.game);
   myHand=sortCards(roomData.hands?.[ME]||[]);
   selH=[];selT=[];didDraw=false;didPlay=false;
+  applyMobileClass();
   goTo('sGame');
   requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();if(G.cur===ME) showToast('¡Tu turno! 🎴',1800);
     else showToast(`Turno de ${G.names[G.cur]}`,1800);startTurnTimer();});
@@ -1057,7 +1028,7 @@ function buildBoard(){
   const chMe=parseInt(bcs.getPropertyValue('--CH-ME'))||ch;
   const HAND_H=98; // mobile hand strip height (matches CSS --MOB-HAND-H)
 
-  const isMobL=('ontouchstart' in window) && W>H && W<=1024;
+  applyMobileClass(); const isMobL=isMobLandscape();
 
   // ── HELPER: place a player zone ──────────────────────────────────────
   function placeZone(i, x, y, pileX, pileY){
@@ -1273,9 +1244,7 @@ function renderZone(i){
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
-      const isMobL=('ontouchstart' in window)
-        && window.innerWidth>window.innerHeight
-        && window.innerWidth<=1024;
+      const isMobL=isMobLandscape();
       const mh=document.getElementById('mobileHand');
 
       if(isMobL && mh){
@@ -2004,6 +1973,7 @@ function updateFullscreenBtn(){
 window.toggleFullscreen=toggleFullscreen;
 
 window.addEventListener('resize',()=>{
+  applyMobileClass();
   updateFullscreenBtn();if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}});
 </script>
 </body>
