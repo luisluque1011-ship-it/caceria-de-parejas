@@ -1051,74 +1051,23 @@ function buildBoard(){
   const board=document.getElementById('sGame');
   const W=board.offsetWidth, H=board.offsetHeight, n=G.n;
   const bcs=getComputedStyle(document.documentElement);
-  const cw=parseInt(bcs.getPropertyValue('--CW'))||52;
-  const ch=parseInt(bcs.getPropertyValue('--CH'))||72;
+  const cw =parseInt(bcs.getPropertyValue('--CW'))||52;
+  const ch =parseInt(bcs.getPropertyValue('--CH'))||72;
   const cwMe=parseInt(bcs.getPropertyValue('--CW-ME'))||cw;
   const chMe=parseInt(bcs.getPropertyValue('--CH-ME'))||ch;
+  const HAND_H=98; // mobile hand strip height (matches CSS --MOB-HAND-H)
 
-  // My hand is wider (bigger cards), others are smaller
-  const handW = Math.min(W*0.42, 9*Math.min(28,130/9)+cwMe);
-  const pileW = cw + 20;   // pile card + small padding
-  const ntH   = 26;        // nametag height
-  const zoneW = handW + 16 + pileW;   // total zone width
-  const zoneH = ch + ntH + 8;         // total zone height
+  const isMobL=('ontouchstart' in window) && W>H && W<=1024;
 
-  // Center of board
-  const cx = W/2, cy = H/2;
-
-  // Polygon radius: leave at least half-zone from edge
-  const rx = Math.max(zoneW*0.6, W/2 - zoneW*0.62);
-  const ry = Math.max(zoneH*1.2, H/2 - zoneH*1.1);
-
-  // Detect mobile touch device
-  const mobile=('ontouchstart' in window&&W<=1024)||W<=700;
-  const bottomReserve = mobile ? (chMe*1.6+50) : 55;
-  const maxRX = W/2 - zoneW/2 - 8;
-  const maxRY = H/2 - zoneH/2 - bottomReserve;
-  const frx = Math.min(rx, maxRX);
-  const fry = Math.min(ry, Math.max(30, maxRY));
-
-  const base = 90 - (360/n)*ME;
-  const rawPos = Array.from({length:n}, (_,i) => {
-    const rad = (base + (360/n)*i) * Math.PI/180;
-    return { x: cx + frx*Math.cos(rad), y: cy + fry*Math.sin(rad) };
-  });
-
-  // Mobile landscape: ME zone is just a placeholder (hand is in fixed strip)
-  // Push ME to top-center so its empty zone doesn't block the board
-  const isMobL=mobile&&W>H;
-  const pos = rawPos.map((p,i)=>{
-    if(isMobL && i===ME){
-      // Put ME zone at top, centered, small — just for pile display
-      return { x: cx, y: topBar + chMe*0.35 };
-    }
-    return p;
-  });
-
-  for(let i=0;i<n;i++){
-    const{x,y}=pos[i];
-    // Radial direction (outward from center)
-    const dx=x-cx, dy=y-cy;
-    const len=Math.sqrt(dx*dx+dy*dy)||1;
-    const nx=dx/len, ny=dy/len;
-    // Perpendicular (clockwise): [ny, -nx]
-    const perpX=ny, perpY=-nx;
-    // Place pile to the side of the hand (always clockwise)
-    const pileGap = handW*0.78 + pileW*0.5 + 40;
-    const px = x + perpX*pileGap;
-    const py = y + perpY*pileGap;
-
-    // ── PILE ZONE ──
+  // ── HELPER: place a player zone ──────────────────────────────────────
+  function placeZone(i, x, y, pileX, pileY){
     const pd=document.createElement('div');
     pd.className='pzone-pile'; pd.id='pd'+i;
-    pd.style.cssText=
-      `position:absolute;left:${px}px;top:${py}px;`+
+    pd.style.cssText=`position:absolute;left:${pileX}px;top:${pileY}px;`+
       `transform:translate(-50%,-50%);z-index:5;`+
       `display:flex;flex-direction:column;align-items:center;gap:4px;`;
     pd.innerHTML=`<div class="nametag" id="nt${i}"></div><div id="sp${i}"></div>`;
     board.appendChild(pd);
-
-    // ── HAND ZONE ──
     const z=document.createElement('div');
     z.className='pzone'+(i===ME?' me-zone':'');
     z.id='pz'+i;
@@ -1127,15 +1076,105 @@ function buildBoard(){
     board.appendChild(z);
   }
 
-  const grid=document.getElementById('tableGrid');
-  grid.innerHTML='';
-  for(let i=0;i<8;i++){
-    const slot=document.createElement('div');
-    slot.className='tslot'; slot.id='ts'+i;
-    grid.appendChild(slot);
+  if(isMobL){
+    // ══════════════════════════════════════════════════════════════
+    // MOBILE LANDSCAPE — layout fijo tipo UNO
+    // Área útil: W x (H - HAND_H)   ← franja inferior = mi mano
+    // ══════════════════════════════════════════════════════════════
+    const areaH = H - HAND_H;   // área de juego sin mi mano
+    const cx = W/2, cy = areaH/2;
+
+    // Mesa en el centro del área útil
+    const grid=document.getElementById('tableGrid');
+    grid.innerHTML='';
+    for(let i=0;i<8;i++){
+      const slot=document.createElement('div');
+      slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
+    }
+    const tc=document.getElementById('tCenter');
+    tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
+
+    // Otros jugadores (todos excepto ME)
+    const others=Array.from({length:n},(_,i)=>i).filter(i=>i!==ME);
+    const nOthers=others.length;
+
+    // Posiciones de los otros — distribuidos arriba y lados
+    // Con 1 otro: arriba centro
+    // Con 2: arriba izquierda y derecha
+    // Con 3: arriba izq, arriba centro, arriba der
+    // Con 4: arriba izq, izq centro, arriba der, der centro
+    const otherPositions=[];
+    const PAD=8; // padding desde el borde
+    const ZONE_W=cw*3+60; // ancho estimado de zona (mano + pila)
+    const ZONE_H=ch+30;
+
+    if(nOthers===1){
+      otherPositions.push({x:cx, y:ZONE_H/2+PAD});
+    } else if(nOthers===2){
+      otherPositions.push({x:W*0.28, y:ZONE_H/2+PAD});
+      otherPositions.push({x:W*0.72, y:ZONE_H/2+PAD});
+    } else if(nOthers===3){
+      otherPositions.push({x:W*0.18, y:ZONE_H/2+PAD});
+      otherPositions.push({x:cx,     y:ZONE_H/2+PAD});
+      otherPositions.push({x:W*0.82, y:ZONE_H/2+PAD});
+    } else { // 4
+      otherPositions.push({x:W*0.15, y:ZONE_H/2+PAD});
+      otherPositions.push({x:W*0.38, y:ZONE_H/2+PAD});
+      otherPositions.push({x:W*0.62, y:ZONE_H/2+PAD});
+      otherPositions.push({x:W*0.85, y:ZONE_H/2+PAD});
+    }
+
+    others.forEach((pi, idx)=>{
+      const op=otherPositions[idx]||{x:cx, y:ZONE_H/2+PAD};
+      // Pile to the right of hand
+      placeZone(pi, op.x, op.y, op.x+cw*1.6, op.y);
+    });
+
+    // ME: pile shown top-center (hand is in fixed strip below)
+    // Just need the pile zone for ME
+    const mePileX=W*0.88, mePileY=areaH*0.5;
+    placeZone(ME, cx, areaH*0.5, mePileX, mePileY);
+
+  } else {
+    // ══════════════════════════════════════════════════════════════
+    // DESKTOP — polygon layout (untouched)
+    // ══════════════════════════════════════════════════════════════
+    const cx=W/2, cy=H/2;
+    const handW=Math.min(W*0.42, 9*Math.min(28,130/9)+cwMe);
+    const pileW=cw+20;
+    const zoneW=handW+16+pileW;
+    const zoneH=ch+26+8;
+    const rx=Math.max(zoneW*0.6, W/2-zoneW*0.62);
+    const ry=Math.max(zoneH*1.2, H/2-zoneH*1.1);
+    const maxRX=W/2-zoneW/2-8;
+    const maxRY=H/2-zoneH/2-55;
+    const frx=Math.min(rx,maxRX);
+    const fry=Math.min(ry,Math.max(30,maxRY));
+    const base=90-(360/n)*ME;
+    const pos=Array.from({length:n},(_,i)=>{
+      const rad=(base+(360/n)*i)*Math.PI/180;
+      return{x:cx+frx*Math.cos(rad), y:cy+fry*Math.sin(rad)};
+    });
+    for(let i=0;i<n;i++){
+      const{x,y}=pos[i];
+      const dx=x-cx, dy=y-cy;
+      const len=Math.sqrt(dx*dx+dy*dy)||1;
+      const perpX=dy/len, perpY=-dx/len;
+      const pileGap=handW*0.78+pileW*0.5+40;
+      const px=x+perpX*pileGap;
+      const py=y+perpY*pileGap;
+      placeZone(i, x, y, px, py);
+    }
+
+    const grid=document.getElementById('tableGrid');
+    grid.innerHTML='';
+    for(let i=0;i<8;i++){
+      const slot=document.createElement('div');
+      slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
+    }
+    const tc=document.getElementById('tCenter');
+    tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
   }
-  const tc=document.getElementById('tCenter');
-  tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
 }
 
 /* ═══════════════════════════ RENDER ═════════════════════════════════ */
