@@ -17,43 +17,89 @@
 @media(min-width:900px){:root{--CW:62px;--CH:86px;--CW-ME:62px;--CH-ME:86px;}}
 @media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
 
-/* ── MOBILE LANDSCAPE ── */
+/* ══════════════════════════════════════════
+   MOBILE LANDSCAPE — layout completamente nuevo
+   ══════════════════════════════════════════ */
 @media(orientation:landscape)and(max-width:1024px)and(hover:none){
-  :root{--CW:30px;--CH:42px;--CW-ME:58px;--CH-ME:80px;}
 
-  /* ── MY HAND: fixed bottom strip ── */
+  /* Tamaños de carta */
+  :root{
+    --CW:28px;--CH:39px;      /* otros jugadores: pequeño */
+    --CW-ME:56px;--CH-ME:78px; /* mi mano: grande */
+    --MOB-HAND-H:98px;         /* altura del strip de mi mano */
+  }
+
+  /* ── LAYOUT: 3 franjas horizontales fijas ──
+     TOP (altura dinámica): jugadores + mesa
+     BOTTOM (98px): mi mano
+  */
+
+  /* Fondo del tablero: dejar espacio abajo para mi mano */
+  #sGame{padding-bottom:var(--MOB-HAND-H);}
+
+  /* ── MI MANO: franja fija inferior ── */
   #mobileHand{
     display:flex!important;
-    position:fixed;bottom:0;left:0;right:0;
-    height:100px;
-    align-items:flex-end;justify-content:center;
-    padding-bottom:6px;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:var(--MOB-HAND-H);
+    background:rgba(0,0,0,.18);
+    border-top:1px solid rgba(212,168,58,.15);
+    align-items:center;
+    justify-content:center;
     z-index:50;
-    pointer-events:none;
+    overflow:hidden;
   }
-  #mobileHand>*{pointer-events:all;}
 
-  /* ── APARTAR: fixed bottom-left ── */
+  /* ── APARTAR: izquierda, centrado verticalmente en la franja ── */
   #actionBar{display:none!important;}
   #btnPlay{
-    display:block!important;position:fixed!important;
-    bottom:12px;left:10px;z-index:60;
-    padding:10px 16px;font-size:.76rem;
+    display:flex!important;
+    align-items:center;
+    position:fixed!important;
+    bottom:calc(var(--MOB-HAND-H)/2 - 18px);
+    left:8px;
+    z-index:60;
+    padding:8px 12px;
+    font-size:.7rem;
+    border-radius:18px;
   }
+  /* ── PASAR: derecha, centrado verticalmente ── */
   #btnPass{
-    display:block!important;position:fixed!important;
-    bottom:12px;right:52px;z-index:60;
-    padding:10px 16px;font-size:.76rem;
+    display:flex!important;
+    align-items:center;
+    position:fixed!important;
+    bottom:calc(var(--MOB-HAND-H)/2 - 18px);
+    right:50px;
+    z-index:60;
+    padding:8px 12px;
+    font-size:.7rem;
+    border-radius:18px;
   }
 
-  /* Timer, sound, leave */
-  #turnTimer{bottom:56px;left:8px;}
-  #timerRing{width:32px;height:32px;font-size:.78rem;}
-  #reactBtn{bottom:12px;right:10px;width:34px;height:34px;font-size:.95rem;}
-  #leaveBtn{top:5px;left:5px;padding:4px 10px;font-size:.62rem;}
-  #soundBar{top:5px;right:5px;}
-  .nametag{font-size:.56rem;padding:2px 5px;}
-  #fullscreenBtn{display:flex!important;left:auto;right:44px;top:10px;}
+  /* ── UI ELEMENTS ── */
+  #turnTimer{
+    position:fixed;
+    bottom:calc(var(--MOB-HAND-H) + 4px);
+    left:8px;z-index:100;
+  }
+  #timerRing{width:30px;height:30px;font-size:.75rem;border-width:2px;}
+  #timerLabel{font-size:.46rem;}
+  #reactBtn{
+    bottom:calc(var(--MOB-HAND-H)/2 - 17px);
+    right:8px;width:34px;height:34px;font-size:.9rem;
+  }
+  #reactPanel{bottom:calc(var(--MOB-HAND-H) + 4px);}
+  #leaveBtn{top:4px;left:4px;padding:4px 9px;font-size:.6rem;}
+  #soundBar{top:4px;right:4px;}
+  #volSlider{width:55px;}
+  #fullscreenBtn{
+    display:flex!important;
+    top:4px;left:auto;right:40px;
+  }
+  .nametag{font-size:.54rem;padding:2px 5px;letter-spacing:0;}
+  /* Robar: más compacto */
+  #drawBtn{padding:3px 8px;font-size:.62rem;}
 }
 /* Mobile portrait */
 @media(orientation:portrait)and(max-width:600px){
@@ -1038,10 +1084,14 @@ function buildBoard(){
     return { x: cx + frx*Math.cos(rad), y: cy + fry*Math.sin(rad) };
   });
 
-  // On mobile landscape: push ME zone to top area (hand shows in fixed strip)
+  // Mobile landscape: ME zone is just a placeholder (hand is in fixed strip)
+  // Push ME to top-center so its empty zone doesn't block the board
   const isMobL=mobile&&W>H;
   const pos = rawPos.map((p,i)=>{
-    if(isMobL && i===ME) return { x:cx, y: topBar + chMe*0.4 };
+    if(isMobL && i===ME){
+      // Put ME zone at top, centered, small — just for pile display
+      return { x: cx, y: topBar + chMe*0.35 };
+    }
     return p;
   });
 
@@ -1097,15 +1147,10 @@ function render(){
   const curDisconnected=!G.connected[G.cur]&&!G.gone[G.cur];
   const myTurn=(G.cur===ME)&&!G.gone[ME]&&!curDisconnected;
   const hasSel=(selH.length+selT.length)>0;
-  const isMobLR=('ontouchstart' in window)&&window.innerWidth>window.innerHeight&&window.innerWidth<=1024;
   document.getElementById('drawBtn').disabled=!myTurn||didDraw||!G.deck.length;
   document.getElementById('btnPlay').disabled=!myTurn||!hasSel;
   document.getElementById('btnPass').disabled=!myTurn||(!didDraw&&!didPlay);
-  // Show/hide mobile standalone buttons
-  const mbp=document.getElementById('btnPlayM');
-  const mbpa=document.getElementById('btnPassM');
-  if(mbp){mbp.style.display=isMobLR?'block':'none';mbp.disabled=!myTurn||!hasSel;}
-  if(mbpa){mbpa.style.display=isMobLR?'block':'none';mbpa.disabled=!myTurn||(!didDraw&&!didPlay);}
+  // Mobile buttons handled by CSS (same #btnPlay/#btnPass with fixed positioning)
   for(let i=0;i<G.n;i++){
     const z=document.getElementById('pz'+i);
     if(z){
@@ -1189,31 +1234,67 @@ function renderZone(i){
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
-      const isMobL=('ontouchstart' in window)&&window.innerWidth>window.innerHeight&&window.innerWidth<=1024;
-      if(isMobL){
-        // Mobile landscape: render hand in fixed bottom strip
-        const mh=document.getElementById('mobileHand');
-        if(mh){
-          mh.innerHTML='';
-          const wrap=document.createElement('div');
-          wrap.style.cssText=`position:relative;width:${fanW}px;height:${fanH}px;`;
-          myHand.forEach((card,j)=>{
-            const rot=count>1?-maxR+j*step:0;
-            const isSel=selH.includes(card.id);
-            const el=mkCard(card);
-            if(isSel) el.classList.add('sel');
-            el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
-              `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
-              `z-index:${j};transform-origin:top center;`;
-            el.addEventListener('click',()=>{if(myTurn)togH(card.id);});
-            wrap.appendChild(el);
-          });
-          mh.appendChild(wrap);
-        }
-        ha.innerHTML=''; // empty the polygon hand zone
+      const isMobL=('ontouchstart' in window)
+        && window.innerWidth>window.innerHeight
+        && window.innerWidth<=1024;
+      const mh=document.getElementById('mobileHand');
+
+      if(isMobL && mh){
+        // ── MÓVIL LANDSCAPE: mano en franja fija abajo ──
+        mh.innerHTML='';
+        // Usar variables CSS de MI mano (más grande)
+        const meCW=parseInt(getComputedStyle(document.documentElement)
+          .getPropertyValue('--CW-ME'))||56;
+        const meCH=parseInt(getComputedStyle(document.documentElement)
+          .getPropertyValue('--CH-ME'))||78;
+        const cnt=myHand.length||1;
+        const mMaxR=Math.min(18,cnt*1.6);
+        const mStep=cnt>1?(mMaxR*2)/(cnt-1):0;
+        // Spread adaptado al ancho disponible (descontar botones: ~110px cada lado)
+        const availW=window.innerWidth-220;
+        const mRawSp=Math.min(30,130/Math.max(cnt-1,1));
+        const mTotalRaw=(cnt-1)*mRawSp+meCW;
+        const mScale=mTotalRaw>availW?(availW-meCW)/Math.max(cnt-1,1)/mRawSp:1;
+        const mSpread=mRawSp*mScale;
+        const mTotalW=(cnt-1)*mSpread+meCW;
+        const mFanW=mTotalW+8;
+        const mFanH=meCH+Math.abs(Math.sin(mMaxR*Math.PI/180))*mTotalW*0.35+10;
+        const mStartX=(mFanW-mTotalW)/2;
+
+        const wrap=document.createElement('div');
+        wrap.style.cssText=`position:relative;width:${mFanW}px;height:${mFanH}px;`;
+        myHand.forEach((card,j)=>{
+          const rot=cnt>1?-mMaxR+j*mStep:0;
+          const isSel=selH.includes(card.id);
+          // Crear carta con tamaño de mi mano (usa --CW-ME via CSS)
+          const el=document.createElement('div');
+          el.className='card-me '+(isRed(card)?'red':'black');
+          el.dataset.id=card.id;
+          el.style.cssText=
+            `width:${meCW}px;height:${meCH}px;background:var(--cbg);`+
+            `border-radius:5px;border:1.5px solid rgba(0,0,0,.12);`+
+            `box-shadow:1px 2px 6px rgba(0,0,0,.28);position:absolute;`+
+            `display:flex;flex-direction:column;justify-content:space-between;`+
+            `padding:2px 3px;flex-shrink:0;cursor:pointer;user-select:none;`+
+            `left:${mStartX+j*mSpread}px;top:0;`+
+            `transform:rotate(${rot}deg) translateY(${isSel?-12:0}px);`+
+            `z-index:${j};transform-origin:top center;`+
+            (isSel?`box-shadow:0 0 0 2.5px var(--gold),0 -6px 16px rgba(212,168,58,.35);border-color:var(--gold);`:'');
+          el.innerHTML=
+            `<div style="font-size:.82rem;font-weight:800;line-height:1.15;">${card.v}<br>`+
+            `<span style="font-size:.8em">${card.s}</span></div>`+
+            `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);`+
+            `font-size:1.5rem;pointer-events:none;">${card.s}</div>`+
+            `<div style="font-size:.82rem;font-weight:800;line-height:1.15;`+
+            `transform:rotate(180deg);align-self:flex-end;">${card.v}<br>`+
+            `<span style="font-size:.8em">${card.s}</span></div>`;
+          el.addEventListener('click',()=>{if(myTurn)togH(card.id);});
+          wrap.appendChild(el);
+        });
+        mh.appendChild(wrap);
+        ha.innerHTML=''; // zona del polígono vacía en móvil
       } else {
-        // Desktop / portrait: render hand in polygon zone normally
-        const mh=document.getElementById('mobileHand');
+        // ── DESKTOP / PORTRAIT: mano en zona del polígono ──
         if(mh) mh.innerHTML='';
         myHand.forEach((card,j)=>{
           const rot=count>1?-maxR+j*step:0;
