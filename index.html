@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes">
+<meta name="viewport" content="width=1024,initial-scale=0.5,maximum-scale=3,user-scalable=yes">
 <title>Cacería de Parejas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -11,79 +11,13 @@
   --cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;
   --bg:#0a2318;--txt:#f0e6d2;
   --CW:52px;--CH:72px;
-  --CW-ME:52px;--CH-ME:72px; /* my hand size = same on desktop */
+  --CW-ME:52px;--CH-ME:72px;
 }
-/* Desktop / large screens — keep original sizes */
-@media(min-width:900px){:root{--CW:62px;--CH:86px;--CW-ME:62px;--CH-ME:86px;}}
+@media(min-width:700px){:root{--CW:58px;--CH:80px;--CW-ME:58px;--CH-ME:80px;}}
+@media(min-width:1000px){:root{--CW:62px;--CH:86px;--CW-ME:62px;--CH-ME:86px;}}
 @media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
 
-/* ── MOBILE LANDSCAPE: clases aplicadas por JS ── */
-body.mob-land{
-  --CW:32px;--CH:45px;       /* cartas mesa/otros: medianas */
-  --CW-ME:58px;--CH-ME:80px; /* mis cartas: grandes */
-  --MOB-H:110px;             /* altura franja inferior */
-}
-/* Franja inferior: fondo igual al tablero, sin división visible */
-body.mob-land #mobileHand{
-  display:flex!important;
-  position:fixed;bottom:0;left:0;right:0;
-  height:var(--MOB-H);
-  background:var(--felt);  /* mismo verde que el tablero */
-  align-items:center;justify-content:center;
-  z-index:50;overflow:visible;
-  border-top:1px solid rgba(255,255,255,.06);
-}
-/* Tablero: dejar espacio para mi mano */
-body.mob-land #sGame{padding-bottom:var(--MOB-H);}
-/* Ocultar actionBar original */
-body.mob-land #actionBar{display:none!important;}
-/* Apartar — izquierda */
-body.mob-land #btnPlay{
-  display:flex!important;align-items:center;
-  position:fixed!important;
-  bottom:calc(var(--MOB-H)/2 - 16px);left:8px;
-  z-index:60;padding:9px 14px;font-size:.72rem;border-radius:20px;
-  background:rgba(212,168,58,.18);color:var(--gold);
-  border:1.5px solid rgba(212,168,58,.5);
-  font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;
-}
-body.mob-land #btnPlay:disabled{opacity:.3;cursor:not-allowed;}
-/* Pasar — derecha */
-body.mob-land #btnPass{
-  display:flex!important;align-items:center;
-  position:fixed!important;
-  bottom:calc(var(--MOB-H)/2 - 16px);right:52px;
-  z-index:60;padding:9px 14px;font-size:.72rem;border-radius:20px;
-  background:rgba(0,0,0,.4);color:var(--gold);
-  border:1.5px solid rgba(212,168,58,.4);
-  font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;
-}
-body.mob-land #btnPass:disabled{opacity:.3;cursor:not-allowed;}
-/* Timer */
-body.mob-land #turnTimer{bottom:calc(var(--MOB-H)+4px);left:8px;}
-body.mob-land #timerRing{width:30px;height:30px;font-size:.75rem;}
-body.mob-land #timerLabel{font-size:.44rem;}
-/* Emoji */
-body.mob-land #reactBtn{
-  bottom:calc(var(--MOB-H)/2 - 18px);right:8px;
-  width:36px;height:36px;font-size:.95rem;
-}
-body.mob-land #reactPanel{bottom:calc(var(--MOB-H)+4px);}
-/* UI corners */
-body.mob-land #leaveBtn{top:4px;left:4px;padding:4px 9px;font-size:.6rem;}
-body.mob-land #soundBar{top:4px;right:4px;}
-body.mob-land #volSlider{width:50px;}
-body.mob-land #drawBtn{padding:3px 8px;font-size:.6rem;}
-body.mob-land .nametag{font-size:.54rem;padding:2px 6px;}
-body.mob-land #fullscreenBtn{display:flex!important;top:4px;right:36px;}
-/* Cartas de mesa más grandes en móvil */
-body.mob-land #tableGrid{gap:4px;}
-body.mob-land .tslot{width:var(--CW);height:calc(var(--CH)+10px);}
-body.mob-land .tslot-empty{width:var(--CW);height:var(--CH);}
-/* Mobile portrait */
-@media(orientation:portrait)and(max-width:600px){
-  :root{--CW:44px;--CH:62px;--CW-ME:44px;--CH-ME:62px;}
-}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--txt);}
 .screen{display:none;position:fixed;inset:0;}
@@ -318,11 +252,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <button class="abtn hi" id="btnPlay" onclick="actPlay()">✓ Apartar</button>
     <button class="abtn"    id="btnPass" onclick="actPass()">→ Pasar</button>
   </div>
-  <!-- Mobile: my hand fixed at bottom strip -->
-  <div id="mobileHand" style="display:none"></div>
-  <!-- Mobile standalone buttons -->
-  <button class="abtn hi" id="btnPlayM" onclick="actPlay()" style="display:none">✓ Apartar</button>
-  <button class="abtn" id="btnPassM" onclick="actPass()" style="display:none">→ Pasar</button>
+
   <div id="turnTimer"><div id="timerRing">20</div><div id="timerLabel">TIEMPO</div></div>
   <button id="reactBtn" onclick="toggleReact()">😄</button>
   <div id="reactPanel">
@@ -658,7 +588,6 @@ async function doRejoin(){
 
   spin(false);
   applyGame(gameData);
-  applyMobileClass();
   goTo('sGame');
   requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();showToast('¡Reconectado! 🔌',1600);startTurnTimer();});
   watchGame();watchReactions();watchEvents();
@@ -750,7 +679,6 @@ async function enterGame(roomData){
   applyGame(roomData.game);
   myHand=sortCards(roomData.hands?.[ME]||[]);
   selH=[];selT=[];didDraw=false;didPlay=false;
-  applyMobileClass();
   goTo('sGame');
   requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();if(G.cur===ME) showToast('¡Tu turno! 🎴',1800);
     else showToast(`Turno de ${G.names[G.cur]}`,1800);startTurnTimer();});
@@ -1058,17 +986,40 @@ function buildBoard(){
   const chMe=parseInt(bcs.getPropertyValue('--CH-ME'))||ch;
   const HAND_H=98; // mobile hand strip height (matches CSS --MOB-HAND-H)
 
-  applyMobileClass(); const isMobL=isMobLandscape();
-
-  // ── HELPER: place a player zone ──────────────────────────────────────
-  function placeZone(i, x, y, pileX, pileY){
+  // Single layout for all devices
+  const cx=W/2, cy=H/2;
+  const handW=Math.min(W*0.42, 9*Math.min(28,130/9)+cwMe);
+  const pileW=cw+20;
+  const zoneW=handW+16+pileW;
+  const zoneH=ch+26+8;
+  const rx=Math.max(zoneW*0.6, W/2-zoneW*0.62);
+  const ry=Math.max(zoneH*1.2, H/2-zoneH*1.1);
+  const maxRX=W/2-zoneW/2-8;
+  const maxRY=H/2-zoneH/2-55;
+  const frx=Math.min(rx,maxRX);
+  const fry=Math.min(ry,Math.max(30,maxRY));
+  const base=90-(360/n)*ME;
+  const pos=Array.from({length:n},(_,i)=>{
+    const rad=(base+(360/n)*i)*Math.PI/180;
+    return{x:cx+frx*Math.cos(rad), y:cy+fry*Math.sin(rad)};
+  });
+  for(let i=0;i<n;i++){
+    const{x,y}=pos[i];
+    const dx=x-cx, dy=y-cy;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    const perpX=dy/len, perpY=-dx/len;
+    const pileGap=handW*0.78+pileW*0.5+40;
+    const px=x+perpX*pileGap;
+    const py=y+perpY*pileGap;
+    // Pile zone
     const pd=document.createElement('div');
     pd.className='pzone-pile'; pd.id='pd'+i;
-    pd.style.cssText=`position:absolute;left:${pileX}px;top:${pileY}px;`+
+    pd.style.cssText=`position:absolute;left:${px}px;top:${py}px;`+
       `transform:translate(-50%,-50%);z-index:5;`+
       `display:flex;flex-direction:column;align-items:center;gap:4px;`;
     pd.innerHTML=`<div class="nametag" id="nt${i}"></div><div id="sp${i}"></div>`;
     board.appendChild(pd);
+    // Hand zone
     const z=document.createElement('div');
     z.className='pzone'+(i===ME?' me-zone':'');
     z.id='pz'+i;
@@ -1076,107 +1027,14 @@ function buildBoard(){
     z.style.cssText=`position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%);`;
     board.appendChild(z);
   }
-
-  if(isMobL){
-    // ══════════════════════════════════════════════════════════════
-    // MOBILE LANDSCAPE — layout fijo tipo UNO
-    // Área útil: W x (H - HAND_H)   ← franja inferior = mi mano
-    // ══════════════════════════════════════════════════════════════
-    const areaH = H - HAND_H;   // área de juego sin mi mano
-    const cx = W/2, cy = areaH/2;
-
-    // Mesa en el centro del área útil
-    const grid=document.getElementById('tableGrid');
-    grid.innerHTML='';
-    for(let i=0;i<8;i++){
-      const slot=document.createElement('div');
-      slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
-    }
-    const tc=document.getElementById('tCenter');
-    // Center table in middle of usable area
-    tc.style.cssText=`left:${cx}px;top:${areaH*0.52}px;transform:translate(-50%,-50%);`;
-
-    // Otros jugadores (todos excepto ME)
-    const others=Array.from({length:n},(_,i)=>i).filter(i=>i!==ME);
-    const nOthers=others.length;
-
-    // Posiciones de los otros — distribuidos arriba y lados
-    // Con 1 otro: arriba centro
-    // Con 2: arriba izquierda y derecha
-    // Con 3: arriba izq, arriba centro, arriba der
-    // Con 4: arriba izq, izq centro, arriba der, der centro
-    const otherPositions=[];
-    const PAD=8; // padding desde el borde
-    const ZONE_W=cw*3+60; // ancho estimado de zona (mano + pila)
-    const ZONE_H=ch+30;
-
-    if(nOthers===1){
-      otherPositions.push({x:cx, y:ZONE_H/2+PAD});
-    } else if(nOthers===2){
-      otherPositions.push({x:W*0.28, y:ZONE_H/2+PAD});
-      otherPositions.push({x:W*0.72, y:ZONE_H/2+PAD});
-    } else if(nOthers===3){
-      otherPositions.push({x:W*0.18, y:ZONE_H/2+PAD});
-      otherPositions.push({x:cx,     y:ZONE_H/2+PAD});
-      otherPositions.push({x:W*0.82, y:ZONE_H/2+PAD});
-    } else { // 4
-      otherPositions.push({x:W*0.15, y:ZONE_H/2+PAD});
-      otherPositions.push({x:W*0.38, y:ZONE_H/2+PAD});
-      otherPositions.push({x:W*0.62, y:ZONE_H/2+PAD});
-      otherPositions.push({x:W*0.85, y:ZONE_H/2+PAD});
-    }
-
-    others.forEach((pi, idx)=>{
-      const op=otherPositions[idx]||{x:cx, y:ZONE_H/2+PAD};
-      // Pile to the right of hand
-      placeZone(pi, op.x, op.y, op.x+cw*1.6, op.y);
-    });
-
-    // ME: hand zone invisible (hand in fixed strip), pile bottom-right
-    // Pile close to the hand strip for easy visual connection
-    const mePileX=W*0.82, mePileY=areaH*0.72;
-    placeZone(ME, cx, areaH*0.85, mePileX, mePileY);
-
-  } else {
-    // ══════════════════════════════════════════════════════════════
-    // DESKTOP — polygon layout (untouched)
-    // ══════════════════════════════════════════════════════════════
-    const cx=W/2, cy=H/2;
-    const handW=Math.min(W*0.42, 9*Math.min(28,130/9)+cwMe);
-    const pileW=cw+20;
-    const zoneW=handW+16+pileW;
-    const zoneH=ch+26+8;
-    const rx=Math.max(zoneW*0.6, W/2-zoneW*0.62);
-    const ry=Math.max(zoneH*1.2, H/2-zoneH*1.1);
-    const maxRX=W/2-zoneW/2-8;
-    const maxRY=H/2-zoneH/2-55;
-    const frx=Math.min(rx,maxRX);
-    const fry=Math.min(ry,Math.max(30,maxRY));
-    const base=90-(360/n)*ME;
-    const pos=Array.from({length:n},(_,i)=>{
-      const rad=(base+(360/n)*i)*Math.PI/180;
-      return{x:cx+frx*Math.cos(rad), y:cy+fry*Math.sin(rad)};
-    });
-    for(let i=0;i<n;i++){
-      const{x,y}=pos[i];
-      const dx=x-cx, dy=y-cy;
-      const len=Math.sqrt(dx*dx+dy*dy)||1;
-      const perpX=dy/len, perpY=-dx/len;
-      const pileGap=handW*0.78+pileW*0.5+40;
-      const px=x+perpX*pileGap;
-      const py=y+perpY*pileGap;
-      placeZone(i, x, y, px, py);
-    }
-
-    const grid=document.getElementById('tableGrid');
-    grid.innerHTML='';
-    for(let i=0;i<8;i++){
-      const slot=document.createElement('div');
-      slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
-    }
-    const tc=document.getElementById('tCenter');
-    tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
+  const grid=document.getElementById('tableGrid');
+  grid.innerHTML='';
+  for(let i=0;i<8;i++){
+    const slot=document.createElement('div');
+    slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
   }
+  const tc=document.getElementById('tCenter');
+  tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
 }
 
 /* ═══════════════════════════ RENDER ═════════════════════════════════ */
@@ -1275,735 +1133,14 @@ function renderZone(i){
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
-      const isMobL=isMobLandscape();
-      const mh=document.getElementById('mobileHand');
-
-      if(isMobL && mh){
-        // ── MÓVIL LANDSCAPE: mano en franja fija abajo ──
-        mh.innerHTML='';
-        // Usar variables CSS de MI mano (más grande)
-        const meCW=parseInt(getComputedStyle(document.documentElement)
-          .getPropertyValue('--CW-ME'))||56;
-        const meCH=parseInt(getComputedStyle(document.documentElement)
-          .getPropertyValue('--CH-ME'))||78;
-        const cnt=myHand.length||1;
-        const mMaxR=Math.min(18,cnt*1.6);
-        const mStep=cnt>1?(mMaxR*2)/(cnt-1):0;
-        // Spread adaptado al ancho disponible (descontar botones: ~110px cada lado)
-        const availW=window.innerWidth-220;
-        const mRawSp=Math.min(30,130/Math.max(cnt-1,1));
-        const mTotalRaw=(cnt-1)*mRawSp+meCW;
-        const mScale=mTotalRaw>availW?(availW-meCW)/Math.max(cnt-1,1)/mRawSp:1;
-        const mSpread=mRawSp*mScale;
-        const mTotalW=(cnt-1)*mSpread+meCW;
-        const mFanW=mTotalW+8;
-        const mFanH=meCH+Math.abs(Math.sin(mMaxR*Math.PI/180))*mTotalW*0.35+10;
-        const mStartX=(mFanW-mTotalW)/2;
-
-        const wrap=document.createElement('div');
-        wrap.style.cssText=`position:relative;width:${mFanW}px;height:${mFanH}px;`;
-        myHand.forEach((card,j)=>{
-          const rot=cnt>1?-mMaxR+j*mStep:0;
-          const isSel=selH.includes(card.id);
-          // Usar mkCard() — mismos estilos que en desktop, tamaño forzado via inline
-          const el=mkCard(card);
-          el.style.width=meCW+'px';
-          el.style.height=meCH+'px';
-          el.style.position='absolute';
-          el.style.left=(mStartX+j*mSpread)+'px';
-          el.style.top='0';
-          el.style.transform=`rotate(${rot}deg) translateY(${isSel?-14:0}px)`;
-          el.style.zIndex=j;
-          el.style.transformOrigin='top center';
-          el.style.fontSize='.82rem';
-          if(isSel){
-            el.style.boxShadow='0 0 0 2.5px var(--gold),0 -6px 16px rgba(212,168,58,.35)';
-            el.style.borderColor='var(--gold)';
-          }
-          // Update inner font sizes for bigger card
-          const cts=el.querySelectorAll('.ct,.cb');
-          cts.forEach(c=>{c.style.fontSize='.84rem';});
-          const cs=el.querySelector('.cs');
-          if(cs) cs.style.fontSize='1.55rem';
-          el.addEventListener('click',()=>{if(myTurn)togH(card.id);});
-          wrap.appendChild(el);
-        });
-        mh.appendChild(wrap);
-        ha.innerHTML=''; // zona del polígono vacía en móvil
-      } else {
-        // ── DESKTOP / PORTRAIT: mano en zona del polígono ──
-        if(mh) mh.innerHTML='';
-        myHand.forEach((card,j)=>{
-          const rot=count>1?-maxR+j*step:0;
-          const isSel=selH.includes(card.id);
-          const el=mkCard(card);
-          if(isSel) el.classList.add('sel');
-          el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
-            `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
-            `z-index:${j};transform-origin:top center;`;
-          if(myTurn) el.addEventListener('click',()=>togH(card.id));
-          ha.appendChild(el);
-        });
-      }
-    } else {
-      for(let j=0;j<count;j++){
+      myHand.forEach((card,j)=>{
         const rot=count>1?-maxR+j*step:0;
-        const el=document.createElement('div');el.className='cback';
-        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;width:${cw_r}px;height:${ch_r}px;transform:rotate(${rot}deg);z-index:${j};transform-origin:top center;`;
+        const isSel=selH.includes(card.id);
+        const el=mkCard(card);
+        if(isSel) el.classList.add('sel');
+        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
+          `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
+          `z-index:${j};transform-origin:top center;`;
+        if(myTurn) el.addEventListener('click',()=>togH(card.id));
         ha.appendChild(el);
-      }
-    }
-  }
-
-  // Clear mobile hand zone when on desktop
-  if(i===ME){
-    const mobile=window.innerWidth<=900&&window.innerHeight<window.innerWidth;
-    if(!mobile){const mhz=document.getElementById('myHandZone');if(mhz)mhz.innerHTML='';}
-  }
-
-  const sp=document.getElementById('sp'+i);
-  if(!sp) return;
-  sp.innerHTML='';
-  if(G.gone[i]){
-    const e=document.createElement('div');e.className='gone-placeholder';e.textContent='🚪';sp.appendChild(e);
-  } else if(!pile.topVal){
-    const e=document.createElement('div');e.className='pile-empty';e.textContent='vacío';sp.appendChild(e);
-  } else {
-    const top={v:pile.topVal,s:pile.topSuit};
-    const st=document.createElement('div');st.className='single-pile';
-    const layers=Math.min((pile.cards||[]).length-1,4);
-    for(let s=0;s<layers;s++){
-      const sh=document.createElement('div');sh.className='sp-sh';
-      sh.style.transform=`translate(${(layers-s)*2}px,${(layers-s)*2}px)`;sh.style.opacity=0.35+s*0.15;
-      st.appendChild(sh);
-    }
-    const face=document.createElement('div');
-    face.className='sp-face '+(isRed(top)?'red':'black');
-    face.innerHTML=`<div class="ct">${top.v}<br><span style="font-size:.8em">${top.s}</span></div><div class="cs">${top.s}</div><div class="cb">${top.v}<br><span style="font-size:.8em">${top.s}</span></div>`;
-    st.appendChild(face);
-    st.addEventListener('click',()=>{});  // pile click — no action
-    sp.appendChild(st);
-  }
-}
-
-function mkCard(card){
-  const el=document.createElement('div');
-  el.className='card '+(isRed(card)?'red':'black');
-  el.dataset.id=card.id;
-  el.innerHTML=`<div class="ct">${card.v}<br><span style="font-size:.82em">${card.s}</span></div><div class="cs">${card.s}</div><div class="cb">${card.v}<br><span style="font-size:.82em">${card.s}</span></div>`;
-  return el;
-}
-
-function mkFly(card,sx,sy){
-  const el=document.createElement('div');el.className='flyc';
-  const col=isRed(card)?'var(--cred)':'var(--cblk)';
-  el.style.cssText=`left:${sx}px;top:${sy}px;color:${col};transform:rotate(-8deg) scale(1.05);transition:none;opacity:1;`;
-  el.innerHTML=`<div style="font-size:.66rem;font-weight:800">${card.v}<br><span style="font-size:.8em">${card.s}</span></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);font-size:1.2rem">${card.s}</div><div style="font-size:.66rem;font-weight:800;transform:rotate(180deg);align-self:flex-end">${card.v}<br><span style="font-size:.8em">${card.s}</span></div>`;
-  return el;
-}
-
-/* ═══════════════════════════ SELECTION ═══════════════════════════════ */
-function togH(id){const i=selH.indexOf(id);if(i>=0)selH.splice(i,1);else selH.push(id);render();}
-function togT(id){const i=selT.indexOf(id);if(i>=0)selT.splice(i,1);else selT.push(id);render();}
-
-/* ═══════════════════════════ ACTIONS ═════════════════════════════════ */
-function guardMyTurn(){
-  if(G.cur!==ME||G.gone[ME]){showToast('No es tu turno',1400);sndErr();return false;}
-  return true;
-}
-
-function actPlay(){
-  if(!guardMyTurn()) return;
-  const hc=myHand.filter(c=>selH.includes(c.id));
-  const tc=G.table.filter(c=>c&&selT.includes(c.id));
-  const all=[...hc,...tc];
-  if(!all.length){showToast('Selecciona cartas primero',1400);sndErr();return;}
-  if(!hc.length){showToast('Necesitas al menos 1 carta de tu mano',1400);sndErr();return;}
-  const val=all[0].v;
-  if(!all.every(c=>c.v===val)){showToast('Todas deben ser del mismo número',1400);sndErr();return;}
-  const myPile=G.piles[ME];
-  const prevPile=G.piles[(G.cur-1+G.n)%G.n];
-  if(myPile.topVal!==val&&prevPile.topVal!==val&&all.length<2){
-    showToast(`Necesitas pareja (2+ cartas de ${val})`,1600);sndErr();return;
-  }
-  const spEl=document.getElementById('sp'+ME);
-  execPlay(hc,tc,ME,spEl,()=>showToast(`¡Parejas de ${val}! 🎴`,800));
-}
-window.actPlay=actPlay;
-
-// actDropOnPile removed — players can only stack on their own pile
-
-function actDraw(){
-  if(!guardMyTurn()) return;
-  if(didDraw){showToast('Ya robaste en este turno',1400);return;}
-  if(!G.deck.length){if(!reshuffleFromPiles()) return;}
-  const card=G.deck.pop();
-  const ins=myHand.findIndex(c=>ORDER[c.v]>ORDER[card.v]);
-  if(ins===-1) myHand.push(card); else myHand.splice(ins,0,card);
-  didDraw=true;
-  G.handCounts[ME]=myHand.length;
-  const deckEl=document.querySelector('#sharedDeck .dstack');
-  const haEl=document.getElementById('ha'+ME);
-  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-  const _dcw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
-  let ex=dr.left,ey=dr.top;
-  if(haEl){const hr=haEl.getBoundingClientRect();ex=hr.left+hr.width/2-_dcw/2;ey=hr.top+4;}
-  // Publish draw event immediately for others to see
-  pushAnimEvent('fly_draw',{card,targetIdx:ME}).catch(()=>{});
-  const fly=mkFly(card,dr.left,dr.top);
-  document.getElementById('sGame').appendChild(fly);
-  sndDraw();
-  requestAnimationFrame(()=>{
-    fly.getBoundingClientRect();
-    fly.style.transition='left .38s cubic-bezier(.2,.7,0,1.15),top .38s cubic-bezier(.2,.7,0,1.15),transform .38s,opacity .28s';
-    fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1.05)';
-    setTimeout(()=>{
-      fly.style.transition='transform .12s ease';
-      fly.style.transform='rotate(0deg) scale(1)';
-      setTimeout(async()=>{fly.remove();render();showToast(`Robaste: ${card.v}${card.s}`,1200);await writeGame();},120);
-    },410);
-  });
-}
-window.actDraw=actDraw;
-
-function actPass(){
-  if(!guardMyTurn()) return;
-  if(!didDraw&&!didPlay){showToast('Apila o roba una carta antes de pasar',1600);sndErr();return;}
-  sndPass();
-  G.noStreak++;
-  // Count only active (connected and not gone) players for condition 3
-  const activePlayers=G.gone.filter((g,i)=>!g&&!G.gone[i]).length||G.n;
-  const activeCount=G.connected.filter((c,i)=>c&&!G.gone[i]).length||1;
-  if(G.noStreak>=activeCount){G.noStreak=0;doRefill(()=>advanceTurn());}
-  else advanceTurn();
-}
-window.actPass=actPass;
-
-/* ═══════════════════════════ EXEC PLAY ════════════════════════════════ */
-function execPlay(hc,tc,targetPileIdx,pileEl,onMsg){
-  const all=[...hc,...tc];
-  const snaps=all.map(c=>{
-    const el=document.querySelector(`[data-id="${c.id}"]`);
-    const r=el?el.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-    return{card:c,sx:r.left,sy:r.top};
-  });
-  const _ecw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CW'))||52;
-  const _ech=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--CH'))||72;
-  const pr=pileEl?pileEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-  const ex=pr.left+pr.width/2-_ecw/2,ey=pr.top+pr.height/2-_ech/2;
-  // DO NOT hide originals yet — the flying card IS the original card visually
-  const board=document.getElementById('sGame');
-
-  function flyNext(i,done){
-    if(i>=snaps.length){done();return;}
-    const{card,sx,sy}=snaps[i];
-    // Hide original only when flight starts for this card
-    const origEl=document.querySelector(`[data-id="${card.id}"]`);
-    if(origEl) origEl.style.opacity='0';
-    const fly=mkFly(card,sx,sy);
-    board.appendChild(fly);
-    sndPlay();
-    requestAnimationFrame(()=>{
-      fly.getBoundingClientRect();
-      // Fly smoothly to pile — no fade out, card stays visible all the way
-      fly.style.transition='left .38s cubic-bezier(.4,0,.2,1),top .38s cubic-bezier(.4,0,.2,1),transform .38s cubic-bezier(.4,0,.2,1)';
-      fly.style.left=ex+'px';
-      fly.style.top=ey+'px';
-      fly.style.transform='rotate(3deg) scale(0.92)';
-      setTimeout(()=>{
-        // Brief scale-down when landing on pile
-        fly.style.transition='transform .1s ease';
-        fly.style.transform='rotate(2deg) scale(0.85)';
-        setTimeout(()=>{fly.remove();flyNext(i+1,done);},100);
-      },390);
-    });
-  }
-
-  // Publish animation event BEFORE starting — reduces perceived latency
-  pushAnimEvent('fly_to_pile_batch',{cards:all,targetPileIdx,fromIdx:ME}).catch(()=>{});
-
-  flyNext(0,async()=>{
-    // Remove from myHand
-    const hcIds=new Set(hc.map(c=>c.id));
-    myHand=myHand.filter(c=>!hcIds.has(c.id));
-    // Remove from table (keep slot position = null, not splice)
-    const tcIds=new Set(tc.map(c=>c.id));
-    G.table=G.table.map(c=>(c&&tcIds.has(c.id))?null:c);
-    // Update pile
-    const pile=G.piles[targetPileIdx];
-    const existingCards=Array.isArray(pile.cards)?pile.cards:(pile.cards?Object.values(pile.cards):[]);
-    pile.cards=[...existingCards,...all];
-    pile.count=pile.cards.length;
-    const top=all[all.length-1];
-    pile.topVal=top.v;pile.topSuit=top.s;
-    G.handCounts[ME]=myHand.length;
-    selH=[];selT=[];didPlay=true;G.noStreak=0;
-    onMsg&&onMsg();
-
-    if(myHand.length===0){
-      G.status='finished';G.winner=ME;
-      render();await writeGame();showWin(ME);return;
-    }
-
-    const live=G.table.filter(c=>c!==null);
-    // Cond 1: mesa vacía | Cond 2: 2+ cartas todas del mismo número
-    const allSame=live.length>=2&&new Set(live.map(c=>c.v)).size===1;
-    if(live.length===0||allSame){
-      doRefill(()=>advanceTurn());
-    } else {
-      render();
-      setTimeout(()=>advanceTurn(),900);
-    }
-  });
-}
-
-/* ═══════════════════════════ REFILL TABLE ══════════════════════════════ */
-function doRefill(onDone){
-  // Find null slots
-  const slots=[];
-  for(let i=0;i<8;i++) if(G.table[i]===null&&G.deck.length) slots.push(i);
-  if(!slots.length){onDone&&onDone();return;}
-
-  const deckEl=document.querySelector('#sharedDeck .dstack');
-  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-  const board=document.getElementById('sGame');
-
-  const newCards=[];
-  slots.forEach(si=>{
-    if(!G.deck.length) return;
-    const c=G.deck.pop();
-    G.table[si]=c;
-    newCards.push({si,card:c});
-  });
-
-  document.getElementById('dCnt').textContent=G.deck.length;
-  // Re-render table so new cards appear (hidden initially)
-  renderTable();
-  newCards.forEach(({si})=>{
-    const slot=document.getElementById('ts'+si);
-    if(slot){const c=slot.querySelector('.card');if(c)c.style.opacity='0';}
-  });
-
-  const total=newCards.length;
-  const stagger=total>1?Math.min(700/(total-1),120):0;
-  const flight=320;
-  let landed=0;
-
-  // Publish refill event immediately so others animate in sync
-  pushAnimEvent('fly_refill',{newCards:newCards.map(nc=>({si:nc.si,card:nc.card}))}).catch(()=>{});
-
-  newCards.forEach(({si,card},idx)=>{
-    const slot=document.getElementById('ts'+si);
-    let ex=innerWidth/2,ey=innerHeight/2;
-    if(slot){const r=slot.getBoundingClientRect();ex=r.left+r.width/2-CW/2;ey=r.top+r.height-CH;}
-    const fly=mkFly(card,dr.left,dr.top);
-    board.appendChild(fly);sndFill(idx);
-    setTimeout(()=>{
-      fly.getBoundingClientRect();
-      fly.style.transition=`left ${flight}ms cubic-bezier(.25,.8,.25,1),top ${flight}ms cubic-bezier(.25,.8,.25,1),transform ${flight}ms,opacity ${flight}ms`;
-      fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1)';
-      setTimeout(()=>{
-        fly.remove();
-        if(slot){const c=slot.querySelector('.card');if(c)c.style.opacity='1';}
-        landed++;
-        if(landed>=total){
-          showToast(`+${landed} cartas a la mesa`,900);
-          onDone&&onDone();
-        }
-      },flight);
-    },idx*stagger);
-  });
-}
-
-/* ═══════════════════════════ ADVANCE TURN ═══════════════════════════════ */
-async function advanceTurn(){
-  stopTurnTimer();
-  // Skip gone players
-  let next=(G.cur+1)%G.n;
-  let tries=0;
-  while(G.gone[next]&&tries<G.n){next=(next+1)%G.n;tries++;}
-  G.cur=next;G.turns++;
-  selH=[];selT=[];
-  render();
-  startTurnTimer();
-  if(G.cur===ME){
-    didDraw=false;didPlay=false;
-    showToast('¡Tu turno! 🎴',1500);
-    unblockEmojis();
-  } else {
-    showToast(`Turno de ${G.names[G.cur]}`,1200);
-  }
-  await writeGame();
-}
-
-/* ═══════════════════════════ RESHUFFLE ══════════════════════════════════ */
-function reshuffleFromPiles(){
-  const recovered=[];
-  for(let i=0;i<G.n;i++){
-    const pile=G.piles[i];
-    const pCards=Array.isArray(pile.cards)?pile.cards:(pile.cards?Object.values(pile.cards):[]);
-    if(G.gone[i]){
-      // Player left — recover ALL their pile cards
-      recovered.push(...pCards);
-      pile.cards=[];pile.count=0;pile.topVal=null;pile.topSuit=null;
-    } else if(pCards.length>1){
-      // Active player — keep only top card, recover the rest
-      recovered.push(...pCards.slice(0,-1));
-      pile.cards=[pCards[pCards.length-1]];
-      pile.count=1;
-    }
-  }
-  if(!recovered.length){showToast('No hay más cartas para recuperar',1800);sndErr();return false;}
-  G.deck=shuffle(recovered);
-  showToast(`🔀 ${G.deck.length} cartas recuperadas`,2000);
-  render();return true;
-}
-
-/* ═══════════════════════════ LEAVE ══════════════════════════════════════ */
-function confirmLeave(){
-  if(!confirm('¿Seguro que quieres salir de la partida?\nTu lugar quedará marcado como \"Salió del juego\".')) return;
-  voluntaryLeave();
-}
-window.confirmLeave=confirmLeave;
-
-async function voluntaryLeave(){
-  if(ROOM&&ME>=0&&G.status==='playing'){
-    G.gone[ME]=true;
-    G.connected[ME]=false;
-    const wasMyTurn=(G.cur===ME);
-    try{
-      // Return my hand cards to deck
-      if(myHand.length){
-        G.deck=shuffle([...G.deck,...myHand]);
-        myHand=[];
-        G.handCounts[ME]=0;
-      }
-      // Return my pile cards to deck (all of them since player is gone)
-      const pile=G.piles[ME];
-      const pCards=Array.isArray(pile.cards)?pile.cards:(pile.cards?Object.values(pile.cards):[]);
-      if(pCards.length){
-        G.deck=shuffle([...G.deck,...pCards]);
-        pile.cards=[];pile.count=0;pile.topVal=null;pile.topSuit=null;
-      }
-      // Check if only 1 player remains
-      const remaining=G.gone.filter(g=>!g).length;
-      if(remaining<=1){
-        const winner=G.gone.findIndex(g=>!g);
-        if(winner>=0){G.status='finished';G.winner=winner;}
-      }
-      await writeGame();
-      if(wasMyTurn&&G.status==='playing') await advanceTurn();
-    }catch(e){}
-  }
-  // If host leaves, mark room as abandoned so others know
-  if(ME===0&&ROOM){
-    try{await set(R(`rooms/${ROOM}/meta/status`),'abandoned');}catch(e){}
-  }
-  clearSession();
-  detachListeners();
-  stopCountdown();
-  ROOM='';ME=-1;MY_NAME='';
-  myHand=[];selH=[];selT=[];didDraw=false;didPlay=false;
-  const mhz=document.getElementById('myHandZone');if(mhz)mhz.innerHTML='';
-  G={n:0,names:[],cur:0,turns:0,noStreak:0,deck:[],table:Array(8).fill(null),piles:[],handCounts:[],connected:[],gone:[],status:'waiting',winner:-1,waitVote:null};
-  goTo('sMenu');
-}
-
-function leaveVoluntary(){
-  detachListeners();clearSession();
-  ROOM='';ME=-1;MY_NAME='';
-  goTo('sMenu');
-}
-window.leaveVoluntary=leaveVoluntary;
-
-function detachListeners(){
-  stopTurnTimer();
-  try{if(offGame){off(R(`rooms/${ROOM}/game`));offGame=null;}}catch(e){}
-  try{if(offReact){off(R(`rooms/${ROOM}/reactions`));offReact=null;}}catch(e){}
-  try{if(offWait){off(R(`rooms/${ROOM}`));offWait=null;}}catch(e){}
-  shownReactKeys=new Set();
-  shownEventKeys=new Set();
-}
-
-/* ═══════════════════════════ WIN ════════════════════════════════════════ */
-async function showWin(w){
-  if(w<0) return;
-  stopTurnTimer();
-  const isWinner=(w===ME);
-  const icon=document.getElementById('wIcon');
-  const title=document.getElementById('wName');
-  const msg=document.getElementById('wMsg');
-  const stat=document.getElementById('wStat');
-  if(isWinner){
-    icon.textContent='🏆';
-    title.className='wtitle winner';
-    title.textContent='¡Ganaste! 🎉';
-    msg.textContent='¡Quedaste sin cartas! Eres el campeón 🃏';
-  } else {
-    icon.textContent='🎴';
-    title.className='wtitle';
-    title.textContent=`¡${G.names[w]} ganó!`;
-    msg.textContent=`${G.names[w]} se quedó sin cartas en mano`;
-  }
-  if(stat) stat.textContent=`${G.turns} turnos jugados`;
-  clearSession();
-  sndWin();
-  goTo('sWin');
-  if(isWinner) doConfetti();
-  // Borrar sala de Firebase después de un momento
-  if(ROOM){
-    setTimeout(async()=>{
-      try{ await set(R(`rooms/${ROOM}`),null); }catch(e){}
-    },5000);
-  }
-}
-
-/* ═══════════════════════════ REACTIONS ══════════════════════════════════ */
-let shownReactKeys=new Set();
-let shownEventKeys=new Set();
-
-/* ═══════════════════════════ ANIMATION EVENTS ════════════════════════════ */
-// Push an animation event so all clients can see it
-async function pushAnimEvent(type,data){
-  if(!ROOM) return;
-  try{
-    await set(push(R(`rooms/${ROOM}/events`)),{type,data,ts:Date.now(),by:ME});
-  }catch(e){}
-}
-
-function watchEvents(){
-  const r=R(`rooms/${ROOM}/events`);
-  onValue(r,snap=>{
-    if(!snap.exists()) return;
-    const now=Date.now();
-    Object.entries(snap.val()).forEach(([key,ev])=>{
-      if(shownEventKeys.has(key)) return;
-      if(now-ev.ts>8000) return;
-      if(ev.by===ME) return; // skip my own events — I already animated locally
-      shownEventKeys.add(key);
-      if(ev.type==='fly_to_pile') animFlyToPile(ev.data);
-      if(ev.type==='fly_to_pile_batch'){
-        const cards=ev.data.cards||[];
-        cards.forEach((c,i)=>{
-          setTimeout(()=>animFlyToPile({card:c,targetPileIdx:ev.data.targetPileIdx,fromIdx:ev.data.fromIdx}),i*500);
-        });
-      }
-      if(ev.type==='fly_draw')    animFlyDraw(ev.data);
-      if(ev.type==='fly_refill')  animFlyRefill(ev.data);
-    });
-  });
-}
-
-// Animate a card flying to someone's pile (visible for all)
-function animFlyToPile(data){
-  const board=document.getElementById('sGame');
-  const spEl=document.getElementById('sp'+data.targetPileIdx);
-  if(!spEl) return;
-  const pr=spEl.getBoundingClientRect();
-  const ex=pr.left+pr.width/2-CW/2;
-  const ey=pr.top+pr.height/2-CH/2;
-  // Start from deck area center (we don't know exact hand position of other player)
-  const deckEl=document.querySelector('#sharedDeck .dstack');
-  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-  // Find hand area of the player who played
-  const haEl=document.getElementById('ha'+data.fromIdx);
-  let sx=dr.left, sy=dr.top;
-  if(haEl){const hr=haEl.getBoundingClientRect();sx=hr.left+hr.width/2;sy=hr.top+hr.height/2;}
-  const fly=mkFly(data.card,sx-CW/2,sy-CH/2);
-  board.appendChild(fly);
-  sndPlay();
-  requestAnimationFrame(()=>{
-    fly.getBoundingClientRect();
-    fly.style.transition='left .38s cubic-bezier(.4,0,.2,1),top .38s cubic-bezier(.4,0,.2,1),transform .38s';
-    fly.style.left=ex+'px';fly.style.top=ey+'px';
-    fly.style.transform='rotate(3deg) scale(0.92)';
-    setTimeout(()=>{
-      fly.style.transition='transform .1s ease';
-      fly.style.transform='rotate(2deg) scale(0.85)';
-      setTimeout(()=>fly.remove(),100);
-    },390);
-  });
-}
-
-// Animate refill for other players
-function animFlyRefill(data){
-  if(!data||!data.newCards) return;
-  const board=document.getElementById('sGame');
-  const deckEl=document.querySelector('#sharedDeck .dstack');
-  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
-  data.newCards.forEach(({si,card},idx)=>{
-    const slot=document.getElementById('ts'+si);
-    if(!slot) return;
-    setTimeout(()=>{
-      const r=slot.getBoundingClientRect();
-      const ex=r.left+r.width/2-CW/2,ey=r.top+r.height-CH;
-      const fly=mkFly(card,dr.left,dr.top);
-      board.appendChild(fly);
-      sndFill(idx);
-      requestAnimationFrame(()=>{
-        fly.getBoundingClientRect();
-        fly.style.transition='left .32s cubic-bezier(.25,.8,.25,1),top .32s cubic-bezier(.25,.8,.25,1),transform .32s,opacity .32s';
-        fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1)';
-        setTimeout(()=>{fly.style.opacity='0';setTimeout(()=>fly.remove(),150);},320);
       });
-    },idx*120);
-  });
-}
-
-// Animate a card flying from deck to a player's hand area (visible for all)
-function animFlyDraw(data){
-  const board=document.getElementById('sGame');
-  const haEl=document.getElementById('ha'+data.targetIdx);
-  const deckEl=document.querySelector('#sharedDeck .dstack');
-  if(!haEl||!deckEl) return;
-  const dr=deckEl.getBoundingClientRect();
-  const hr=haEl.getBoundingClientRect();
-  const ex=hr.left+hr.width/2-CW/2;
-  const ey=hr.top+4;
-  // Show card face to owner, back to others
-  let fly;
-  if(data.targetIdx===ME){
-    fly=mkFly(data.card,dr.left,dr.top);
-  } else {
-    fly=document.createElement('div');fly.className='flyc';
-    fly.style.cssText=`left:${dr.left}px;top:${dr.top}px;background:var(--cback);transform:rotate(-5deg) scale(1.05);transition:none;opacity:1;`;
-    fly.innerHTML=`<div style="position:absolute;inset:4px;border:1px solid rgba(212,168,58,.2);border-radius:3px;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(212,168,58,.07) 4px,rgba(212,168,58,.07) 5px)"></div>`;
-  }
-  board.appendChild(fly);
-  requestAnimationFrame(()=>{
-    fly.getBoundingClientRect();
-    // Fly to hand — stays visible, no fade
-    fly.style.transition='left .4s cubic-bezier(.4,0,.2,1),top .4s cubic-bezier(.4,0,.2,1),transform .4s';
-    fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1.05)';
-    setTimeout(()=>{
-      fly.style.transition='transform .12s ease';
-      fly.style.transform='rotate(0deg) scale(1)';
-      setTimeout(()=>fly.remove(),120);
-    },410);
-  });
-}
-function watchReactions(){
-  const r=R(`rooms/${ROOM}/reactions`);
-  offReact=onValue(r,snap=>{
-    if(!snap.exists()) return;
-    const now=Date.now();
-    const data=snap.val();
-    Object.entries(data).forEach(([key,rx])=>{
-      // Only show emojis from OTHERS (mine already shown locally)
-      // and only if recent and not already shown
-      if(!shownReactKeys.has(key)&&now-rx.ts<4000&&rx.name!==MY_NAME){
-        shownReactKeys.add(key);
-        floatEmoji(rx.emoji,rx.name);
-      }
-    });
-    // Clean old keys
-    if(shownReactKeys.size>50) shownReactKeys=new Set();
-  });
-}
-function floatEmoji(emoji,name){
-  const el=document.createElement('div');el.className='float-emoji';
-  el.innerHTML=`<span>${emoji}</span>${name?`<span class="fe-label">${name}</span>`:''}`;
-  el.style.left=(Math.random()*55+20)+'vw';el.style.bottom='80px';
-  document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
-}
-async function sendEmoji(emoji){
-  if(emojiBlocked) return;
-  if(!checkEmojiRate()) return;
-  // Show locally immediately — just once
-  floatEmoji(emoji,MY_NAME);
-  // Push to Firebase for others — with unique key to prevent duplicates
-  try{
-    await set(push(R(`rooms/${ROOM}/reactions`)),{emoji,name:MY_NAME,ts:Date.now()});
-  }catch(e){}
-}
-window.sendEmoji=sendEmoji;
-function toggleReact(){document.getElementById('reactPanel').classList.toggle('open');}
-window.toggleReact=toggleReact;
-document.addEventListener('click',e=>{
-  const panel=document.getElementById('reactPanel'),btn=document.getElementById('reactBtn');
-  if(panel&&btn&&!panel.contains(e.target)&&!btn.contains(e.target)) panel.classList.remove('open');
-});
-
-/* ═══════════════════════════ CONFETTI ═══════════════════════════════════ */
-function doConfetti(){
-  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
-  cv.width=innerWidth;cv.height=innerHeight;
-  const P=Array.from({length:100},()=>({x:Math.random()*cv.width,y:-10,vx:(Math.random()-.5)*5,vy:2+Math.random()*5,col:['#d4a83a','#c0392b','#1a3a6b','#2d7a4f','#f0c96a','#fff'][0|Math.random()*6],w:6+Math.random()*10,h:3+Math.random()*6,rot:Math.random()*360,vr:(Math.random()-.5)*8}));
-  let f=0;
-  (function tick(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.col;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});if(++f<200)requestAnimationFrame(tick);else ctx.clearRect(0,0,cv.width,cv.height);})();
-}
-
-/* ═══════════════════════════ RESIZE ═════════════════════════════════════ */
-/* ═══════════════════════════ MENU CARD ANIMATION ═══════════════════════════ */
-(function menuAnim(){
-  const CARDS=[
-    {txt:'A♥',cls:'r'},{txt:'2♦',cls:'r'},{txt:'3♥',cls:'r'},{txt:'4♦',cls:'r'},
-    {txt:'5♣',cls:'b'},{txt:'6♠',cls:'b'},{txt:'7♥',cls:'r'},{txt:'8♣',cls:'b'},
-    {txt:'9♦',cls:'r'},{txt:'10♠',cls:'b'},{txt:'J♥',cls:'r'},{txt:'Q♣',cls:'b'},
-    {txt:'K♦',cls:'r'},{txt:'J♠',cls:'b'},{txt:'Q♥',cls:'r'},{txt:'K♣',cls:'b'}
-  ];
-  // Starting values
-  let cur=[
-    {txt:'7♥',cls:'r'},{txt:'J♠',cls:'b'},
-    {txt:'Q♦',cls:'r'},{txt:'K♣',cls:'b'}
-  ];
-  const slots=[0,1,2,3];
-
-  function nextCard(exclude){
-    let c;
-    do{ c=CARDS[0|Math.random()*CARDS.length]; }
-    while(c.txt===exclude);
-    return c;
-  }
-
-  function animSlot(idx){
-    const el=document.getElementById('mc'+idx);
-    if(!el) return;
-    // Fade out
-    el.classList.add('fade');
-    setTimeout(()=>{
-      const next=nextCard(cur[idx].txt);
-      cur[idx]=next;
-      el.className='sc '+(next.cls)+' fade';
-      el.textContent=next.txt;
-      // Fade in
-      setTimeout(()=>el.classList.remove('fade'),30);
-    },500);
-  }
-
-  // Animate one random card every 1.8 seconds
-  setInterval(()=>{
-    const idx=0|Math.random()*4;
-    animSlot(idx);
-  },1800);
-})();
-
-function toggleFullscreen(){
-  const btn=document.getElementById('fullscreenBtn');
-  if(!document.fullscreenElement){
-    document.documentElement.requestFullscreen().catch(()=>{});
-    if(btn) btn.textContent='⛶';
-  } else {
-    document.exitFullscreen().catch(()=>{});
-    if(btn) btn.textContent='⛶';
-  }
-}
-document.addEventListener('fullscreenchange',()=>{
-  const btn=document.getElementById('fullscreenBtn');
-  if(btn) btn.textContent=document.fullscreenElement?'✕':'⛶';
-});
-// Show fullscreen btn only on mobile
-function updateFullscreenBtn(){
-  const btn=document.getElementById('fullscreenBtn');
-  if(!btn) return;
-  const isMobile=('ontouchstart' in window&&window.innerWidth<=1024)||window.innerWidth<=700;
-  btn.style.display=isMobile?'flex':'none';
-}
-window.toggleFullscreen=toggleFullscreen;
-
-window.addEventListener('resize',()=>{
-  applyMobileClass();
-  updateFullscreenBtn();if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}});
-</script>
-</body>
-</html>
