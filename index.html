@@ -2,23 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Cacería de Parejas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --felt:#1e6b40;--gold:#d4a83a;--gold2:#f0c96a;
-  --cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;
-  --bg:#0a2318;--txt:#f0e6d2;
-  --CW:52px;--CH:72px;
-  --CW-ME:52px;--CH-ME:72px;
-}
-@media(min-width:700px){:root{--CW:58px;--CH:80px;--CW-ME:58px;--CH-ME:80px;}}
-@media(min-width:1000px){:root{--CW:62px;--CH:86px;--CW-ME:62px;--CH-ME:86px;}}
-@media(min-width:1300px){:root{--CW:68px;--CH:94px;--CW-ME:68px;--CH-ME:94px;}}
-
-
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-touch-callout:none;}
+:root{--felt:#1e6b40;--gold:#d4a83a;--gold2:#f0c96a;--cbg:#fdf6e3;--cred:#c0392b;--cblk:#1a1a2e;--cback:#1a3a6b;--bg:#0a2318;--txt:#f0e6d2;--CW:52px;--CH:72px;--CW-ME:84px;--CH-ME:116px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--txt);}
 .screen{display:none;position:fixed;inset:0;}
 .screen.active{display:block;}
@@ -105,7 +94,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .tslot .card.sel{transform:translateY(-12px);}
 .tslot .card.hint{transform:translateY(-4px);}
 /* ACTION BAR */
-#actionBar{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:100;display:flex;gap:8px;align-items:center;}
+#actionBar{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:100;display:flex;gap:8px;align-items:center;}
+#btnPlay{position:fixed!important;bottom:18px;left:calc(50% - 400px);z-index:101;}
+#btnPass{position:fixed!important;bottom:18px;right:calc(50% - 400px);z-index:101;}
 .abtn{background:rgba(0,0,0,.48);color:var(--gold);border:1.5px solid rgba(212,168,58,.45);padding:9px 20px;border-radius:22px;font-size:.8rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
 .abtn:disabled{opacity:.25;cursor:not-allowed;}
 .abtn.hi{background:rgba(212,168,58,.18);border-color:var(--gold);}
@@ -165,15 +156,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #spinner.on{display:flex;}
 .spin-ring{width:44px;height:44px;border:3px solid rgba(212,168,58,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-/* ── MÓVIL: botones más grandes para tocar ── */
-@media(max-width:768px){
-  .abtn{padding:14px 24px!important;font-size:.88rem!important;min-height:48px;}
-  #drawBtn{padding:8px 16px!important;font-size:.78rem!important;min-height:40px;}
-  #reactBtn{width:48px!important;height:48px!important;font-size:1.3rem!important;}
-  #leaveBtn{padding:8px 14px!important;font-size:.72rem!important;min-height:36px;}
-  .remoji{font-size:1.9rem!important;padding:8px!important;}
-  .nametag{font-size:.72rem!important;padding:5px 12px!important;}
-}
 </style>
 </head>
 <body>
@@ -243,7 +225,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 <!-- JUEGO -->
 <div id="sGame" class="screen">
   <button id="leaveBtn" onclick="confirmLeave()">🚪 Salir</button>
-  <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Pantalla completa" style="display:none;position:fixed;top:10px;left:90px;z-index:100;background:rgba(0,0,0,.4);border:1px solid rgba(212,168,58,.35);border-radius:50%;width:32px;height:32px;font-size:.9rem;cursor:pointer;align-items:center;justify-content:center;color:var(--gold);">⛶</button>
   <div id="soundBar">
     <div class="snd-btn" id="muteBtn" onclick="toggleMute()">🔊</div>
     <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.5" oninput="setVol(this.value)">
@@ -261,7 +242,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <button class="abtn hi" id="btnPlay" onclick="actPlay()">✓ Apartar</button>
     <button class="abtn"    id="btnPass" onclick="actPass()">→ Pasar</button>
   </div>
-
   <div id="turnTimer"><div id="timerRing">20</div><div id="timerLabel">TIEMPO</div></div>
   <button id="reactBtn" onclick="toggleReact()">😄</button>
   <div id="reactPanel">
@@ -331,7 +311,7 @@ const SUITS=['♥','♦','♠','♣'];
 const VALS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const ORDER={A:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13};
 const RED=new Set(['♥','♦']);
-const CW=62,CH=86;
+const CW=52,CH=72,CW_ME=84,CH_ME=116;
 const WAIT_SECS=10;
 
 /* ── SESSION ────────────────────────────────────────────── */
@@ -364,7 +344,6 @@ let G={
 let offGame=null,offReact=null,offWait=null;
 let _cdRunning=false;
 
-/* ═══════════════════════════ COUNTDOWN 3-2-1 ═══════════════════════════ */
 function runCountdown(roomData){
   const btn=document.getElementById('btnStart');
   const hint=document.getElementById('waitHint');
@@ -372,22 +351,18 @@ function runCountdown(roomData){
   if(btn) btn.style.display='none';
   if(hint) hint.textContent='';
   if(cdEl) cdEl.style.display='block';
-
   let count=3;
   function tick(){
     if(cdEl) cdEl.textContent=count;
-    if(count===3||count===2) sndBeep(false);
+    if(count>=2) sndBeep(false);
     else if(count===1) sndBeep(true);
-
     if(count<=0){
       if(cdEl){cdEl.textContent='🎴';sndGo();}
       setTimeout(()=>{
         if(cdEl) cdEl.style.display='none';
         _cdRunning=false;
-        // Detach wait listener and enter game
         const r=R(`rooms/${ROOM}`);
         try{off(r);}catch(e){}offWait=null;
-        // Mark as playing so others enter too
         if(ME===0) set(R(`rooms/${ROOM}/meta/status`),'playing').catch(()=>{});
         enterGame(roomData);
       },600);
@@ -417,26 +392,23 @@ const sndDraw=()=>tone(440,'sine',.14,.01,.12);
 const sndFill=(i)=>setTimeout(()=>tone(300+i*30,'triangle',.1,.005,.07),i*80);
 const sndWin=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.18,.01,.25),i*120));
 const sndErr=()=>tone(180,'sawtooth',.08,.005,.13);
-const sndBeep=(high)=>tone(high?880:660,'sine',.22,.005,.18);
+const sndBeep=(hi)=>tone(hi?880:660,'sine',.22,.005,.18);
 const sndGo=()=>{tone(1046,'sine',.28,.005,.3);setTimeout(()=>tone(1318,'sine',.22,.005,.25),120);}
 const sndPass=()=>{
-  // Golpe sordo de mesa estilo poker — ruido blanco corto + sub-bass
   if(muted) return;
   try{
     const{actx:c,mGain:g}=aud();
     const t=c.currentTime;
-    // Primer golpe
-    [0, 0.28].forEach((delay,i)=>{
-      const buf=c.createBuffer(1,c.sampleRate*0.08,c.sampleRate);
-      const d=buf.getChannelData(0);
-      for(let k=0;k<d.length;k++) d[k]=(Math.random()*2-1)*Math.pow(1-k/d.length,3);
-      const src=c.createBufferSource();src.buffer=buf;
-      const bp=c.createBiquadFilter();bp.type='lowpass';bp.frequency.value=180;
-      const env=c.createGain();
-      env.gain.setValueAtTime(i===0?.18:.13,t+delay);
-      env.gain.exponentialRampToValueAtTime(0.001,t+delay+0.07);
-      src.connect(bp);bp.connect(env);env.connect(g);
-      src.start(t+delay);src.stop(t+delay+0.08);
+    [0,0.28].forEach((delay,i)=>{
+      const o=c.createOscillator(),e=c.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(i===0?140:120,t+delay);
+      o.frequency.exponentialRampToValueAtTime(i===0?60:55,t+delay+0.08);
+      e.gain.setValueAtTime(0,t+delay);
+      e.gain.linearRampToValueAtTime(i===0?0.35:0.25,t+delay+0.005);
+      e.gain.exponentialRampToValueAtTime(0.001,t+delay+0.18);
+      o.connect(e);e.connect(g);
+      o.start(t+delay);o.stop(t+delay+0.2);
     });
   }catch(e){}
 };
@@ -454,26 +426,6 @@ function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.
 function sortCards(h){return[...h].sort((a,b)=>ORDER[a.v]-ORDER[b.v]);}
 const isRed=c=>RED.has(c.s);
 const uid=()=>Math.random().toString(36).substr(2,9);
-
-/* ── MOBILE DETECTION (JS-based, reliable on all devices) ── */
-function isMobLandscape(){
-  // Detect by screen size + touch + orientation
-  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-  const isLandscape=window.innerWidth>window.innerHeight;
-  const isSmall=window.innerWidth<=1024;
-  return isTouch&&isLandscape&&isSmall;
-}
-
-function applyMobileClass(){
-  if(isMobLandscape()){
-    document.body.classList.add('mob-land');
-  } else {
-    document.body.classList.remove('mob-land');
-    // Clear mobile hand when not in landscape
-    const mh=document.getElementById('mobileHand');
-    if(mh) mh.innerHTML='';
-  }
-}
 
 /* ═══════════════════════════ UI HELPERS ═══════════════════════════ */
 function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
@@ -504,8 +456,8 @@ async function createRoom(){
 window.createRoom=createRoom;
 
 async function joinRoom(){
-  const _jn=document.getElementById('joinName').value.trim();
-  // Default name set after knowing slot index
+  const _jnRaw=document.getElementById('joinName').value.trim();
+  // Default assigned after knowing slot
   const code=document.getElementById('joinCode').value.trim().toUpperCase();
   if(code.length!==4){showToast('Código de 4 letras',1600);return;}
   spin(true);
@@ -517,7 +469,7 @@ async function joinRoom(){
   const roster=(await get(R(`rooms/${code}/roster`))).val()||[];
   if(roster.length>=meta.maxPlayers){spin(false);showToast('Sala llena',1800);return;}
   ME=roster.length;ROOM=code;
-  MY_NAME=(_jn||('Jugador '+(roster.length+1))).slice(0,14);
+  MY_NAME=(_jnRaw||('Jugador '+(roster.length+1))).slice(0,14);
   saveSession();
   roster.push({name:MY_NAME,idx:ME});
   await set(R(`rooms/${code}/roster`),roster);
@@ -535,9 +487,8 @@ async function genCode(){
     code=Array.from({length:4},()=>chars[0|Math.random()*chars.length]).join('');
     const snap=await get(R(`rooms/${code}/meta`));
     if(!snap.exists()) break;
-    const meta=snap.val();
-    // Sala expirada (más de 5 horas) → reutilizable
-    if(!meta.createdAt||Date.now()-meta.createdAt>5*60*60*1000) break;
+    const m=snap.val();
+    if(!m.createdAt||Date.now()-m.createdAt>5*60*60*1000) break;
     attempts++;
   }while(attempts<10);
   return code;
@@ -546,7 +497,7 @@ async function genCode(){
 /* ═══════════════════════════ SESSION PERSISTENCE ═══════════════════════════ */
 // Save session so player can rejoin after page reload
 function saveSession(){
-  try{localStorage.setItem('cdp_session',JSON.stringify({room:ROOM,me:ME,name:MY_NAME}));}catch(e){}
+  try{localStorage.setItem('cdp_session',JSON.stringify({room:ROOM,me:ME,name:MY_NAME,ts:Date.now()}));}catch(e){}
 }
 function clearSession(){try{localStorage.removeItem('cdp_session');}catch(e){}}
 function loadSession(){try{return JSON.parse(localStorage.getItem('cdp_session'));}catch(e){return null;}}
@@ -557,7 +508,8 @@ window.addEventListener('load',async()=>{
   if(!sess||!sess.room) return;
   // Check if game is still active
   const meta=(await get(R(`rooms/${sess.room}/meta`))).val();
-  if(meta&&meta.status==='playing'){
+  if(meta&&(meta.status==='playing'||meta.status==='countdown')){
+    // Pre-fill with saved info so player doesn't need to type again
     document.getElementById('rejoinName').value=sess.name||'';
     document.getElementById('rejoinCode').value=sess.room||'';
     goTo('sRejoin');
@@ -575,12 +527,20 @@ async function doRejoin(){
   const meta=(await get(R(`rooms/${code}/meta`))).val();
   if(!meta||meta.status!=='playing'){spin(false);showToast('La partida ya no está activa',1800);clearSession();goTo('sMenu');return;}
 
-  // Find this player in the roster
   const roster=(await get(R(`rooms/${code}/roster`))).val()||[];
-  const found=roster.find(p=>p.name===name);
-  if(!found){spin(false);showToast('No se encontró tu nombre en esta sala.\nSolo pueden volver quienes jugaron desde el inicio.',2400);return;}
+  // Primary: use saved session index (most reliable)
+  const sess=loadSession();
+  let found=null;
+  if(sess&&sess.room===code&&sess.me>=0&&roster[sess.me]){
+    found=roster[sess.me];
+  }
+  // Fallback: match by name if session not available
+  if(!found&&rejRaw){
+    found=roster.find(p=>p.name===rejRaw);
+  }
+  if(!found){spin(false);showToast('No se encontró tu lugar en esta sala.\nSolo pueden volver quienes jugaron desde el inicio.',2400);return;}
 
-  ROOM=code;ME=found.idx;MY_NAME=name;
+  ROOM=code; ME=found.idx; MY_NAME=found.name; // ALWAYS use original name from roster
   saveSession();
 
   // Mark as connected again
@@ -590,7 +550,7 @@ async function doRejoin(){
   if(gameData.connected) gameData.connected[ME]=true;
   await set(R(`rooms/${code}/game/connected`),gameData.connected||[]);
 
-  // Load my private hand
+  // Load my CURRENT hand from Firebase (updated after each action)
   const handSnap=await get(R(`rooms/${code}/hands/${ME}`));
   myHand=sortCards(handSnap.val()||[]);
   selH=[];selT=[];didDraw=false;didPlay=false;
@@ -598,7 +558,7 @@ async function doRejoin(){
   spin(false);
   applyGame(gameData);
   goTo('sGame');
-  requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();showToast('¡Reconectado! 🔌',1600);startTurnTimer();});
+  requestAnimationFrame(()=>{buildBoard();render();showToast('¡Reconectado! 🔌',1600);startTurnTimer();});
   watchGame();watchReactions();watchEvents();
   // Mark online in presence
   markPresence(true);
@@ -677,7 +637,6 @@ async function hostStart(){
   };
   for(let i=0;i<n;i++) await set(R(`rooms/${ROOM}/hands/${i}`),hands[i]);
   await set(R(`rooms/${ROOM}/game`),game);
-  // Signal countdown to all players
   await set(R(`rooms/${ROOM}/meta/status`),'countdown');
   spin(false);
 }
@@ -689,8 +648,8 @@ async function enterGame(roomData){
   myHand=sortCards(roomData.hands?.[ME]||[]);
   selH=[];selT=[];didDraw=false;didPlay=false;
   goTo('sGame');
-  requestAnimationFrame(()=>{buildBoard();render();updateFullscreenBtn();if(G.cur===ME) showToast('¡Tu turno! 🎴',1800);
-    else showToast(`Turno de ${G.names[G.cur]}`,1800);startTurnTimer();});
+  requestAnimationFrame(()=>{buildBoard();render();if(G.cur===ME) showToast('¡Tu turno! 🎴',1800);
+    else showToast(`Turno de ${G.names[G.cur]}`,1800);});
   watchGame();watchReactions();watchEvents();
   markPresence(true);
   startTurnTimer();
@@ -715,6 +674,7 @@ function applyGame(d){
   G.status=d.status||'playing';
   G.winner=d.winner!=null?d.winner:-1;
   G.waitVote=d.waitVote||null;
+  G.turnStartedAt=d.turnStartedAt||Date.now();
 }
 
 /* ═══════════════════════════ WATCH GAME ════════════════════════════ */
@@ -766,7 +726,9 @@ function watchGame(){
 function startTurnTimer(){
   stopTurnTimer();
   if(G.status!=='playing') return;
-  turnTimerSecs=20;
+  // Calculate remaining time based on when turn started (survives page reload)
+  const elapsed=G.turnStartedAt?Math.floor((Date.now()-G.turnStartedAt)/1000):0;
+  turnTimerSecs=Math.max(0,20-elapsed);
   const ring=document.getElementById('timerRing');
   const timer=document.getElementById('turnTimer');
   if(!ring||!timer) return;
@@ -782,12 +744,13 @@ function startTurnTimer(){
       stopTurnTimer();
       // Time up: only draw if player hasn't drawn yet this turn
       if(G.cur===ME&&!G.gone[ME]){
-        if(!didDraw&&G.deck.length){
+        if(!didDraw&&!didPlay&&G.deck.length){
           const card=G.deck.pop();
           const ins=myHand.findIndex(c=>ORDER[c.v]>ORDER[card.v]);
           if(ins===-1) myHand.push(card); else myHand.splice(ins,0,card);
           G.handCounts[ME]=myHand.length;
           showToast('⏱️ Tiempo agotado — carta robada',1800);
+          await writeMyHand();
           pushAnimEvent('fly_draw',{card,targetIdx:ME}).catch(()=>{});
         } else if(!didDraw&&!G.deck.length){
           showToast('⏱️ Tiempo agotado',1500);
@@ -850,6 +813,11 @@ function checkLastPlayer(){
   }
 }
 
+async function writeMyHand(){
+  if(!ROOM||ME<0) return;
+  try{await set(R(`rooms/${ROOM}/hands/${ME}`),myHand);}catch(e){}
+}
+
 async function writeGame(){
   await set(R(`rooms/${ROOM}/game`),{
     n:G.n,names:G.names,cur:G.cur,turns:G.turns,
@@ -858,7 +826,8 @@ async function writeGame(){
     piles:G.piles,handCounts:G.handCounts,
     connected:G.connected,gone:G.gone,
     status:G.status,winner:G.winner,
-    waitVote:G.waitVote||null
+    waitVote:G.waitVote||null,
+    turnStartedAt:G.turnStartedAt||Date.now()
   });
 }
 
@@ -985,50 +954,33 @@ function hideVoteUI(){
 
 /* ═══════════════════════════ BUILD BOARD ════════════════════════════ */
 function buildBoard(){
+  // Clean ALL dynamic board elements
   document.querySelectorAll('.pzone,.pzone-pile').forEach(e=>e.remove());
   const board=document.getElementById('sGame');
-  const W=board.offsetWidth, H=board.offsetHeight, n=G.n;
-  const bcs=getComputedStyle(document.documentElement);
-  const cw =parseInt(bcs.getPropertyValue('--CW'))||52;
-  const ch =parseInt(bcs.getPropertyValue('--CH'))||72;
-  const cwMe=parseInt(bcs.getPropertyValue('--CW-ME'))||cw;
-  const chMe=parseInt(bcs.getPropertyValue('--CH-ME'))||ch;
-  const HAND_H=98; // mobile hand strip height (matches CSS --MOB-HAND-H)
-
-  // Single layout for all devices
-  const cx=W/2, cy=H/2;
-  const handW=Math.min(W*0.42, 9*Math.min(28,130/9)+cwMe);
-  const pileW=cw+20;
-  const zoneW=handW+16+pileW;
-  const zoneH=ch+26+8;
-  const rx=Math.max(zoneW*0.6, W/2-zoneW*0.62);
-  const ry=Math.max(zoneH*1.2, H/2-zoneH*1.1);
-  const maxRX=W/2-zoneW/2-8;
-  const maxRY=H/2-zoneH/2-55;
-  const frx=Math.min(rx,maxRX);
-  const fry=Math.min(ry,Math.max(30,maxRY));
+  const W=board.offsetWidth,H=board.offsetHeight,n=G.n;
+  const rx=W*0.34,ry=H*0.30,cx=W/2,cy=H/2-10;
   const base=90-(360/n)*ME;
   const pos=Array.from({length:n},(_,i)=>{
-    const rad=(base+(360/n)*i)*Math.PI/180;
-    return{x:cx+frx*Math.cos(rad), y:cy+fry*Math.sin(rad)};
+    const rad=(base+(360/n)*i)*(Math.PI/180);
+    return{x:cx+rx*Math.cos(rad),y:cy+ry*Math.sin(rad)};
   });
+  // My pile uses bigger offset to not overlap bigger hand
+  const PILE_DX=230, PILE_DY=-CH/2;
+
   for(let i=0;i<n;i++){
     const{x,y}=pos[i];
-    const dx=x-cx, dy=y-cy;
-    const len=Math.sqrt(dx*dx+dy*dy)||1;
-    const perpX=dy/len, perpY=-dx/len;
-    const pileGap=handW*0.78+pileW*0.5+40;
-    const px=x+perpX*pileGap;
-    const py=y+perpY*pileGap;
-    // Pile zone
+
+    // ── PILE ZONE (fixed, never moves) ──
     const pd=document.createElement('div');
-    pd.className='pzone-pile'; pd.id='pd'+i;
-    pd.style.cssText=`position:absolute;left:${px}px;top:${py}px;`+
+    pd.className='pzone-pile';
+    pd.id='pd'+i;
+    pd.style.cssText=`position:absolute;left:${x+PILE_DX}px;top:${y+PILE_DY}px;`+
       `transform:translate(-50%,-50%);z-index:5;`+
-      `display:flex;flex-direction:column;align-items:center;gap:4px;`;
+      `display:flex;flex-direction:column;align-items:center;gap:5px;`;
     pd.innerHTML=`<div class="nametag" id="nt${i}"></div><div id="sp${i}"></div>`;
     board.appendChild(pd);
-    // Hand zone
+
+    // ── HAND ZONE (floats freely around anchor) ──
     const z=document.createElement('div');
     z.className='pzone'+(i===ME?' me-zone':'');
     z.id='pz'+i;
@@ -1036,14 +988,17 @@ function buildBoard(){
     z.style.cssText=`position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%);`;
     board.appendChild(z);
   }
+
+  // Fixed 8-slot table grid
   const grid=document.getElementById('tableGrid');
   grid.innerHTML='';
   for(let i=0;i<8;i++){
     const slot=document.createElement('div');
-    slot.className='tslot'; slot.id='ts'+i; grid.appendChild(slot);
+    slot.className='tslot';slot.id='ts'+i;
+    grid.appendChild(slot);
   }
   const tc=document.getElementById('tCenter');
-  tc.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
+  tc.style.cssText=`left:${W/2}px;top:${H/2-10}px;transform:translate(-50%,-50%);`;
 }
 
 /* ═══════════════════════════ RENDER ═════════════════════════════════ */
@@ -1058,7 +1013,6 @@ function render(){
   document.getElementById('drawBtn').disabled=!myTurn||didDraw||!G.deck.length;
   document.getElementById('btnPlay').disabled=!myTurn||!hasSel;
   document.getElementById('btnPass').disabled=!myTurn||(!didDraw&&!didPlay);
-  // Mobile buttons handled by CSS (same #btnPlay/#btnPass with fixed positioning)
   for(let i=0;i<G.n;i++){
     const z=document.getElementById('pz'+i);
     if(z){
@@ -1116,29 +1070,19 @@ function renderZone(i){
     else                nt.innerHTML=G.names[i]+(i===ME?' 👤':'')+dot;
   }
 
-  const cs=getComputedStyle(document.documentElement);
-  const cw_r=parseInt(isMe?cs.getPropertyValue('--CW-ME'):cs.getPropertyValue('--CW'))||52;
-  const ch_r=parseInt(isMe?cs.getPropertyValue('--CH-ME'):cs.getPropertyValue('--CH'))||72;
   const count=isMe?myHand.length:(G.handCounts[i]||0);
-  const sw=document.getElementById('sGame').offsetWidth;
-  const sh=document.getElementById('sGame').offsetHeight;
-  // My hand takes more space, others less — especially on mobile
-  const maxFanW=isMe?Math.min(sw*0.52,sw-120):sw*0.24;
+  // Use bigger card size for MY hand
+  const cardW=isMe?CW_ME:CW;
+  const cardH=isMe?CH_ME:CH;
   if(!count){
     ha.innerHTML='<div style="font-size:.55rem;color:rgba(255,255,255,.22);padding:8px 4px;text-align:center;">Sin<br>cartas</div>';
   } else {
-    const maxR=Math.min(22,count*1.8);
+    const maxR=Math.min(isMe?20:26,count*(isMe?1.6:2));
     const step=count>1?(maxR*2)/(count-1):0;
-    // Spread: natural spacing but capped so fan never exceeds maxFanW
-    const naturalSpread=Math.min(36,160/Math.max(count-1,1));
-    const naturalTotal=(count-1)*naturalSpread+cw_r;
-    const spreadScale=naturalTotal>maxFanW
-      ? Math.max(0.3,(maxFanW-cw_r)/Math.max(count-1,1)/naturalSpread)
-      : 1;
-    const spread=naturalSpread*spreadScale;
-    const totalW=(count-1)*spread+cw_r;
-    const fanW=totalW+8;
-    const fanH=ch_r+Math.abs(Math.sin(maxR*Math.PI/180))*totalW*0.38+14;
+    const spread=isMe?Math.min(38,180/Math.max(count-1,1)):Math.min(32,150/Math.max(count-1,1));
+    const totalW=(count-1)*spread+cardW;
+    const fanW=Math.max(totalW+8,isMe?200:160);
+    const fanH=cardH+Math.abs(Math.sin(maxR*Math.PI/180))*totalW*0.45+14;
     const startX=(fanW-totalW)/2;
     ha.style.cssText=`width:${fanW}px;height:${fanH}px;position:relative;`;
     if(isMe){
@@ -1147,9 +1091,638 @@ function renderZone(i){
         const isSel=selH.includes(card.id);
         const el=mkCard(card);
         if(isSel) el.classList.add('sel');
-        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;`+
-          `transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);`+
-          `z-index:${j};transform-origin:top center;`;
+        if(isMe){
+          el.style.width=CW_ME+'px';el.style.height=CH_ME+'px';
+          // Scale inner text for bigger card
+          el.querySelectorAll('.ct,.cb').forEach(e=>e.style.fontSize='.9rem');
+          const cs=el.querySelector('.cs');if(cs)cs.style.fontSize='1.7rem';
+        }
+        el.style.cssText+=`position:absolute;left:${startX+j*spread}px;top:0;transform:rotate(${rot}deg) translateY(${isSel?-10:0}px);z-index:${j};transform-origin:top center;`;
         if(myTurn) el.addEventListener('click',()=>togH(card.id));
         ha.appendChild(el);
       });
+    } else {
+      for(let j=0;j<count;j++){
+        const rot=count>1?-maxR+j*step:0;
+        const el=document.createElement('div');el.className='cback';
+        el.style.cssText=`position:absolute;left:${startX+j*spread}px;top:0;width:${cardW}px;height:${cardH}px;transform:rotate(${rot}deg);z-index:${j};transform-origin:top center;`;
+        ha.appendChild(el);
+      }
+    }
+  }
+
+  const sp=document.getElementById('sp'+i);
+  if(!sp) return;
+  sp.innerHTML='';
+  if(G.gone[i]){
+    const e=document.createElement('div');e.className='gone-placeholder';e.textContent='🚪';sp.appendChild(e);
+  } else if(!pile.topVal){
+    const e=document.createElement('div');e.className='pile-empty';e.textContent='vacío';sp.appendChild(e);
+  } else {
+    const top={v:pile.topVal,s:pile.topSuit};
+    const st=document.createElement('div');st.className='single-pile';
+    const layers=Math.min((pile.cards||[]).length-1,4);
+    for(let s=0;s<layers;s++){
+      const sh=document.createElement('div');sh.className='sp-sh';
+      sh.style.transform=`translate(${(layers-s)*2}px,${(layers-s)*2}px)`;sh.style.opacity=0.35+s*0.15;
+      st.appendChild(sh);
+    }
+    const face=document.createElement('div');
+    face.className='sp-face '+(isRed(top)?'red':'black');
+    face.innerHTML=`<div class="ct">${top.v}<br><span style="font-size:.8em">${top.s}</span></div><div class="cs">${top.s}</div><div class="cb">${top.v}<br><span style="font-size:.8em">${top.s}</span></div>`;
+    st.appendChild(face);
+    st.addEventListener('click',()=>{});  // pile click — no action
+    sp.appendChild(st);
+  }
+}
+
+function mkCard(card){
+  const el=document.createElement('div');
+  el.className='card '+(isRed(card)?'red':'black');
+  el.dataset.id=card.id;
+  el.innerHTML=`<div class="ct">${card.v}<br><span style="font-size:.82em">${card.s}</span></div><div class="cs">${card.s}</div><div class="cb">${card.v}<br><span style="font-size:.82em">${card.s}</span></div>`;
+  return el;
+}
+
+function mkFly(card,sx,sy){
+  const el=document.createElement('div');el.className='flyc';
+  const col=isRed(card)?'var(--cred)':'var(--cblk)';
+  el.style.cssText=`left:${sx}px;top:${sy}px;color:${col};transform:rotate(-8deg) scale(1.05);transition:none;opacity:1;`;
+  el.innerHTML=`<div style="font-size:.66rem;font-weight:800">${card.v}<br><span style="font-size:.8em">${card.s}</span></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);font-size:1.2rem">${card.s}</div><div style="font-size:.66rem;font-weight:800;transform:rotate(180deg);align-self:flex-end">${card.v}<br><span style="font-size:.8em">${card.s}</span></div>`;
+  return el;
+}
+
+/* ═══════════════════════════ SELECTION ═══════════════════════════════ */
+function togH(id){const i=selH.indexOf(id);if(i>=0)selH.splice(i,1);else selH.push(id);render();}
+function togT(id){const i=selT.indexOf(id);if(i>=0)selT.splice(i,1);else selT.push(id);render();}
+
+/* ═══════════════════════════ ACTIONS ═════════════════════════════════ */
+function guardMyTurn(){
+  if(G.cur!==ME||G.gone[ME]){showToast('No es tu turno',1400);sndErr();return false;}
+  return true;
+}
+
+function actPlay(){
+  if(!guardMyTurn()) return;
+  const hc=myHand.filter(c=>selH.includes(c.id));
+  const tc=G.table.filter(c=>c&&selT.includes(c.id));
+  const all=[...hc,...tc];
+  if(!all.length){showToast('Selecciona cartas primero',1400);sndErr();return;}
+  if(!hc.length){showToast('Necesitas al menos 1 carta de tu mano',1400);sndErr();return;}
+  const val=all[0].v;
+  if(!all.every(c=>c.v===val)){showToast('Todas deben ser del mismo número',1400);sndErr();return;}
+  const myPile=G.piles[ME];
+  const prevPile=G.piles[(G.cur-1+G.n)%G.n];
+  if(myPile.topVal!==val&&prevPile.topVal!==val&&all.length<2){
+    showToast(`Necesitas pareja (2+ cartas de ${val})`,1600);sndErr();return;
+  }
+  const spEl=document.getElementById('sp'+ME);
+  execPlay(hc,tc,ME,spEl,()=>showToast(`¡Parejas de ${val}! 🎴`,800));
+}
+window.actPlay=actPlay;
+
+// actDropOnPile removed — players can only stack on their own pile
+
+function actDraw(){
+  if(!guardMyTurn()) return;
+  if(didDraw){showToast('Ya robaste en este turno',1400);return;}
+  if(!G.deck.length){if(!reshuffleFromPiles()) return;}
+  const card=G.deck.pop();
+  const ins=myHand.findIndex(c=>ORDER[c.v]>ORDER[card.v]);
+  if(ins===-1) myHand.push(card); else myHand.splice(ins,0,card);
+  didDraw=true;
+  G.handCounts[ME]=myHand.length;
+  const deckEl=document.querySelector('#sharedDeck .dstack');
+  const haEl=document.getElementById('ha'+ME);
+  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+  let ex=dr.left,ey=dr.top;
+  if(haEl){const hr=haEl.getBoundingClientRect();ex=hr.left+hr.width/2-CW_ME/2;ey=hr.top+4;}
+  // Publish draw event immediately for others to see
+  pushAnimEvent('fly_draw',{card,targetIdx:ME}).catch(()=>{});
+  const fly=mkFly(card,dr.left,dr.top);
+  document.getElementById('sGame').appendChild(fly);
+  sndDraw();
+  requestAnimationFrame(()=>{
+    fly.getBoundingClientRect();
+    fly.style.transition='left .38s cubic-bezier(.2,.7,0,1.15),top .38s cubic-bezier(.2,.7,0,1.15),transform .38s,opacity .28s';
+    fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1.05)';
+    setTimeout(()=>{
+      fly.style.transition='transform .12s ease';
+      fly.style.transform='rotate(0deg) scale(1)';
+      setTimeout(async()=>{fly.remove();render();showToast(`Robaste: ${card.v}${card.s}`,1200);await writeMyHand();await writeGame();},120);
+    },410);
+  });
+}
+window.actDraw=actDraw;
+
+function actPass(){
+  if(!guardMyTurn()) return;
+  if(!didDraw&&!didPlay){showToast('Apila o roba una carta antes de pasar',1600);sndErr();return;}
+  sndPass();
+  G.noStreak++;
+  // Count only active (connected and not gone) players for condition 3
+  const activePlayers=G.gone.filter((g,i)=>!g&&!G.gone[i]).length||G.n;
+  const activeCount=G.connected.filter((c,i)=>c&&!G.gone[i]).length||1;
+  if(G.noStreak>=activeCount){G.noStreak=0;doRefill(()=>advanceTurn());}
+  else advanceTurn();
+}
+window.actPass=actPass;
+
+/* ═══════════════════════════ EXEC PLAY ════════════════════════════════ */
+function execPlay(hc,tc,targetPileIdx,pileEl,onMsg){
+  const all=[...hc,...tc];
+  const snaps=all.map(c=>{
+    const el=document.querySelector(`[data-id="${c.id}"]`);
+    const r=el?el.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+    return{card:c,sx:r.left,sy:r.top};
+  });
+  const _ecw=hc.length>0?CW_ME:CW; const _ech=hc.length>0?CH_ME:CH;
+  const pr=pileEl?pileEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+  const ex=pr.left+pr.width/2-_ecw/2,ey=pr.top+pr.height/2-_ech/2;
+  // DO NOT hide originals yet — the flying card IS the original card visually
+  const board=document.getElementById('sGame');
+
+  function flyNext(i,done){
+    if(i>=snaps.length){done();return;}
+    const{card,sx,sy}=snaps[i];
+    // Hide original only when flight starts for this card
+    const origEl=document.querySelector(`[data-id="${card.id}"]`);
+    if(origEl) origEl.style.opacity='0';
+    const fly=mkFly(card,sx,sy);
+    board.appendChild(fly);
+    sndPlay();
+    requestAnimationFrame(()=>{
+      fly.getBoundingClientRect();
+      // Fly smoothly to pile — no fade out, card stays visible all the way
+      fly.style.transition='left .38s cubic-bezier(.4,0,.2,1),top .38s cubic-bezier(.4,0,.2,1),transform .38s cubic-bezier(.4,0,.2,1)';
+      fly.style.left=ex+'px';
+      fly.style.top=ey+'px';
+      fly.style.transform='rotate(3deg) scale(0.92)';
+      setTimeout(()=>{
+        // Brief scale-down when landing on pile
+        fly.style.transition='transform .1s ease';
+        fly.style.transform='rotate(2deg) scale(0.85)';
+        setTimeout(()=>{fly.remove();flyNext(i+1,done);},100);
+      },390);
+    });
+  }
+
+  // Publish animation event BEFORE starting — reduces perceived latency
+  pushAnimEvent('fly_to_pile_batch',{cards:all,targetPileIdx,fromIdx:ME}).catch(()=>{});
+
+  flyNext(0,async()=>{
+    // Remove from myHand
+    const hcIds=new Set(hc.map(c=>c.id));
+    myHand=myHand.filter(c=>!hcIds.has(c.id));
+    // Remove from table (keep slot position = null, not splice)
+    const tcIds=new Set(tc.map(c=>c.id));
+    G.table=G.table.map(c=>(c&&tcIds.has(c.id))?null:c);
+    // Update pile
+    const pile=G.piles[targetPileIdx];
+    const existingCards=Array.isArray(pile.cards)?pile.cards:(pile.cards?Object.values(pile.cards):[]);
+    pile.cards=[...existingCards,...all];
+    pile.count=pile.cards.length;
+    const top=all[all.length-1];
+    pile.topVal=top.v;pile.topSuit=top.s;
+    G.handCounts[ME]=myHand.length;
+    selH=[];selT=[];didPlay=true;G.noStreak=0;
+    onMsg&&onMsg();
+
+    if(myHand.length===0){
+      G.status='finished';G.winner=ME;
+      render();await writeGame();showWin(ME);return;
+    }
+
+    const live=G.table.filter(c=>c!==null);
+    // Cond 1: mesa vacía | Cond 2: 2+ cartas todas del mismo número
+    const allSame=live.length>=2&&new Set(live.map(c=>c.v)).size===1;
+    if(live.length===0||allSame){
+      doRefill(()=>advanceTurn());
+    } else {
+      render();
+      setTimeout(()=>advanceTurn(),900);
+    }
+  });
+}
+
+/* ═══════════════════════════ REFILL TABLE ══════════════════════════════ */
+function doRefill(onDone){
+  // Find null slots
+  const slots=[];
+  for(let i=0;i<8;i++) if(G.table[i]===null&&G.deck.length) slots.push(i);
+  if(!slots.length){onDone&&onDone();return;}
+
+  const deckEl=document.querySelector('#sharedDeck .dstack');
+  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+  const board=document.getElementById('sGame');
+
+  const newCards=[];
+  slots.forEach(si=>{
+    if(!G.deck.length) return;
+    const c=G.deck.pop();
+    G.table[si]=c;
+    newCards.push({si,card:c});
+  });
+
+  document.getElementById('dCnt').textContent=G.deck.length;
+  // Re-render table so new cards appear (hidden initially)
+  renderTable();
+  newCards.forEach(({si})=>{
+    const slot=document.getElementById('ts'+si);
+    if(slot){const c=slot.querySelector('.card');if(c)c.style.opacity='0';}
+  });
+
+  const total=newCards.length;
+  const stagger=total>1?Math.min(700/(total-1),120):0;
+  const flight=320;
+  let landed=0;
+
+  // Publish refill event immediately so others animate in sync
+  pushAnimEvent('fly_refill',{newCards:newCards.map(nc=>({si:nc.si,card:nc.card}))}).catch(()=>{});
+
+  newCards.forEach(({si,card},idx)=>{
+    const slot=document.getElementById('ts'+si);
+    let ex=innerWidth/2,ey=innerHeight/2;
+    if(slot){const r=slot.getBoundingClientRect();ex=r.left+r.width/2-CW/2;ey=r.top+r.height-CH;}
+    const fly=mkFly(card,dr.left,dr.top);
+    board.appendChild(fly);sndFill(idx);
+    setTimeout(()=>{
+      fly.getBoundingClientRect();
+      fly.style.transition=`left ${flight}ms cubic-bezier(.25,.8,.25,1),top ${flight}ms cubic-bezier(.25,.8,.25,1),transform ${flight}ms,opacity ${flight}ms`;
+      fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1)';
+      setTimeout(()=>{
+        fly.remove();
+        if(slot){const c=slot.querySelector('.card');if(c)c.style.opacity='1';}
+        landed++;
+        if(landed>=total){
+          showToast(`+${landed} cartas a la mesa`,900);
+          onDone&&onDone();
+        }
+      },flight);
+    },idx*stagger);
+  });
+}
+
+/* ═══════════════════════════ ADVANCE TURN ═══════════════════════════════ */
+async function advanceTurn(){
+  stopTurnTimer();
+  G.turnStartedAt=Date.now();
+  // Skip gone players
+  let next=(G.cur+1)%G.n;
+  let tries=0;
+  while(G.gone[next]&&tries<G.n){next=(next+1)%G.n;tries++;}
+  G.cur=next;G.turns++;
+  selH=[];selT=[];
+  render();
+  startTurnTimer();
+  if(G.cur===ME){
+    didDraw=false;didPlay=false;
+    showToast('¡Tu turno! 🎴',1500);
+    unblockEmojis();
+  } else {
+    showToast(`Turno de ${G.names[G.cur]}`,1200);
+  }
+  await writeGame();
+}
+
+/* ═══════════════════════════ RESHUFFLE ══════════════════════════════════ */
+function reshuffleFromPiles(){
+  const recovered=[];
+  for(let i=0;i<G.n;i++){
+    const pile=G.piles[i];
+    const pCards=Array.isArray(pile.cards)?pile.cards:(pile.cards?Object.values(pile.cards):[]);
+    if(G.gone[i]){
+      // Player left — recover ALL their pile cards
+      recovered.push(...pCards);
+      pile.cards=[];pile.count=0;pile.topVal=null;pile.topSuit=null;
+    } else if(pCards.length>1){
+      // Active player — keep only top card, recover the rest
+      recovered.push(...pCards.slice(0,-1));
+      pile.cards=[pCards[pCards.length-1]];
+      pile.count=1;
+    }
+  }
+  if(!recovered.length){showToast('No hay más cartas para recuperar',1800);sndErr();return false;}
+  G.deck=shuffle(recovered);
+  showToast(`🔀 ${G.deck.length} cartas recuperadas`,2000);
+  render();return true;
+}
+
+/* ═══════════════════════════ LEAVE ══════════════════════════════════════ */
+function confirmLeave(){
+  if(!confirm('¿Seguro que quieres salir de la partida?\nTu lugar quedará marcado como \"Salió del juego\".')) return;
+  voluntaryLeave();
+}
+window.confirmLeave=confirmLeave;
+
+async function voluntaryLeave(){
+  if(ROOM&&ME>=0&&G.status==='playing'){
+    G.gone[ME]=true;
+    G.connected[ME]=false;
+    const wasMyTurn=(G.cur===ME);
+    try{
+      // Return my hand cards to deck
+      if(myHand.length){
+        G.deck=shuffle([...G.deck,...myHand]);
+        myHand=[];
+        G.handCounts[ME]=0;
+      }
+      // Return my pile cards to deck (all of them since player is gone)
+      const pile=G.piles[ME];
+      const pCards=Array.isArray(pile.cards)?pile.cards:(pile.cards?Object.values(pile.cards):[]);
+      if(pCards.length){
+        G.deck=shuffle([...G.deck,...pCards]);
+        pile.cards=[];pile.count=0;pile.topVal=null;pile.topSuit=null;
+      }
+      // Check if only 1 player remains
+      const remaining=G.gone.filter(g=>!g).length;
+      if(remaining<=1){
+        const winner=G.gone.findIndex(g=>!g);
+        if(winner>=0){G.status='finished';G.winner=winner;}
+      }
+      await writeGame();
+      if(wasMyTurn&&G.status==='playing') await advanceTurn();
+    }catch(e){}
+  }
+  clearSession();
+  detachListeners();
+  stopCountdown();
+  ROOM='';ME=-1;MY_NAME='';
+  myHand=[];selH=[];selT=[];didDraw=false;didPlay=false;
+  G={n:0,names:[],cur:0,turns:0,noStreak:0,deck:[],table:Array(8).fill(null),piles:[],handCounts:[],connected:[],gone:[],status:'waiting',winner:-1,waitVote:null};
+  goTo('sMenu');
+}
+
+function leaveVoluntary(){
+  detachListeners();clearSession();
+  ROOM='';ME=-1;MY_NAME='';
+  goTo('sMenu');
+}
+window.leaveVoluntary=leaveVoluntary;
+
+function detachListeners(){
+  stopTurnTimer();
+  try{if(offGame){off(R(`rooms/${ROOM}/game`));offGame=null;}}catch(e){}
+  try{if(offReact){off(R(`rooms/${ROOM}/reactions`));offReact=null;}}catch(e){}
+  try{if(offWait){off(R(`rooms/${ROOM}`));offWait=null;}}catch(e){}
+  shownReactKeys=new Set();
+  shownEventKeys=new Set();
+}
+
+/* ═══════════════════════════ WIN ════════════════════════════════════════ */
+async function showWin(w){
+  if(w<0) return;
+  stopTurnTimer();
+  const isWinner=(w===ME);
+  const icon=document.getElementById('wIcon');
+  const title=document.getElementById('wName');
+  const msg=document.getElementById('wMsg');
+  const stat=document.getElementById('wStat');
+  if(isWinner){
+    icon.textContent='🏆';
+    title.className='wtitle winner';
+    title.textContent='¡Ganaste! 🎉';
+    msg.textContent='¡Quedaste sin cartas! Eres el campeón 🃏';
+  } else {
+    icon.textContent='🎴';
+    title.className='wtitle';
+    title.textContent=`¡${G.names[w]} ganó!`;
+    msg.textContent=`${G.names[w]} se quedó sin cartas en mano`;
+  }
+  if(stat) stat.textContent=`${G.turns} turnos jugados`;
+  clearSession();
+  sndWin();
+  goTo('sWin');
+  if(isWinner) doConfetti();
+  // Borrar sala de Firebase después de un momento
+  if(ROOM){
+    setTimeout(async()=>{
+      try{ await set(R(`rooms/${ROOM}`),null); }catch(e){}
+    },5000);
+  }
+}
+
+/* ═══════════════════════════ REACTIONS ══════════════════════════════════ */
+let shownReactKeys=new Set();
+let shownEventKeys=new Set();
+
+/* ═══════════════════════════ ANIMATION EVENTS ════════════════════════════ */
+// Push an animation event so all clients can see it
+async function pushAnimEvent(type,data){
+  if(!ROOM) return;
+  try{
+    await set(push(R(`rooms/${ROOM}/events`)),{type,data,ts:Date.now(),by:ME});
+  }catch(e){}
+}
+
+function watchEvents(){
+  const r=R(`rooms/${ROOM}/events`);
+  onValue(r,snap=>{
+    if(!snap.exists()) return;
+    const now=Date.now();
+    Object.entries(snap.val()).forEach(([key,ev])=>{
+      if(shownEventKeys.has(key)) return;
+      if(now-ev.ts>8000) return;
+      if(ev.by===ME) return; // skip my own events — I already animated locally
+      shownEventKeys.add(key);
+      if(ev.type==='fly_to_pile') animFlyToPile(ev.data);
+      if(ev.type==='fly_to_pile_batch'){
+        const cards=ev.data.cards||[];
+        cards.forEach((c,i)=>{
+          setTimeout(()=>animFlyToPile({card:c,targetPileIdx:ev.data.targetPileIdx,fromIdx:ev.data.fromIdx}),i*500);
+        });
+      }
+      if(ev.type==='fly_draw')    animFlyDraw(ev.data);
+      if(ev.type==='fly_refill')  animFlyRefill(ev.data);
+    });
+  });
+}
+
+// Animate a card flying to someone's pile (visible for all)
+function animFlyToPile(data){
+  const board=document.getElementById('sGame');
+  const spEl=document.getElementById('sp'+data.targetPileIdx);
+  if(!spEl) return;
+  const pr=spEl.getBoundingClientRect();
+  const ex=pr.left+pr.width/2-CW/2;
+  const ey=pr.top+pr.height/2-CH/2;
+  // Start from deck area center (we don't know exact hand position of other player)
+  const deckEl=document.querySelector('#sharedDeck .dstack');
+  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+  // Find hand area of the player who played
+  const haEl=document.getElementById('ha'+data.fromIdx);
+  let sx=dr.left, sy=dr.top;
+  if(haEl){const hr=haEl.getBoundingClientRect();sx=hr.left+hr.width/2;sy=hr.top+hr.height/2;}
+  const fly=mkFly(data.card,sx-CW/2,sy-CH/2);
+  board.appendChild(fly);
+  sndPlay();
+  requestAnimationFrame(()=>{
+    fly.getBoundingClientRect();
+    fly.style.transition='left .38s cubic-bezier(.4,0,.2,1),top .38s cubic-bezier(.4,0,.2,1),transform .38s';
+    fly.style.left=ex+'px';fly.style.top=ey+'px';
+    fly.style.transform='rotate(3deg) scale(0.92)';
+    setTimeout(()=>{
+      fly.style.transition='transform .1s ease';
+      fly.style.transform='rotate(2deg) scale(0.85)';
+      setTimeout(()=>fly.remove(),100);
+    },390);
+  });
+}
+
+// Animate refill for other players
+function animFlyRefill(data){
+  if(!data||!data.newCards) return;
+  const board=document.getElementById('sGame');
+  const deckEl=document.querySelector('#sharedDeck .dstack');
+  const dr=deckEl?deckEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2};
+  data.newCards.forEach(({si,card},idx)=>{
+    const slot=document.getElementById('ts'+si);
+    if(!slot) return;
+    setTimeout(()=>{
+      const r=slot.getBoundingClientRect();
+      const ex=r.left+r.width/2-CW/2,ey=r.top+r.height-CH;
+      const fly=mkFly(card,dr.left,dr.top);
+      board.appendChild(fly);
+      sndFill(idx);
+      requestAnimationFrame(()=>{
+        fly.getBoundingClientRect();
+        fly.style.transition='left .32s cubic-bezier(.25,.8,.25,1),top .32s cubic-bezier(.25,.8,.25,1),transform .32s,opacity .32s';
+        fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1)';
+        setTimeout(()=>{fly.style.opacity='0';setTimeout(()=>fly.remove(),150);},320);
+      });
+    },idx*120);
+  });
+}
+
+// Animate a card flying from deck to a player's hand area (visible for all)
+function animFlyDraw(data){
+  const board=document.getElementById('sGame');
+  const haEl=document.getElementById('ha'+data.targetIdx);
+  const deckEl=document.querySelector('#sharedDeck .dstack');
+  if(!haEl||!deckEl) return;
+  const dr=deckEl.getBoundingClientRect();
+  const hr=haEl.getBoundingClientRect();
+  const ex=hr.left+hr.width/2-CW/2;
+  const ey=hr.top+4;
+  // Show card face to owner, back to others
+  let fly;
+  if(data.targetIdx===ME){
+    fly=mkFly(data.card,dr.left,dr.top);
+  } else {
+    fly=document.createElement('div');fly.className='flyc';
+    fly.style.cssText=`left:${dr.left}px;top:${dr.top}px;background:var(--cback);transform:rotate(-5deg) scale(1.05);transition:none;opacity:1;`;
+    fly.innerHTML=`<div style="position:absolute;inset:4px;border:1px solid rgba(212,168,58,.2);border-radius:3px;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(212,168,58,.07) 4px,rgba(212,168,58,.07) 5px)"></div>`;
+  }
+  board.appendChild(fly);
+  requestAnimationFrame(()=>{
+    fly.getBoundingClientRect();
+    // Fly to hand — stays visible, no fade
+    fly.style.transition='left .4s cubic-bezier(.4,0,.2,1),top .4s cubic-bezier(.4,0,.2,1),transform .4s';
+    fly.style.left=ex+'px';fly.style.top=ey+'px';fly.style.transform='rotate(0deg) scale(1.05)';
+    setTimeout(()=>{
+      fly.style.transition='transform .12s ease';
+      fly.style.transform='rotate(0deg) scale(1)';
+      setTimeout(()=>fly.remove(),120);
+    },410);
+  });
+}
+function watchReactions(){
+  const r=R(`rooms/${ROOM}/reactions`);
+  offReact=onValue(r,snap=>{
+    if(!snap.exists()) return;
+    const now=Date.now();
+    const data=snap.val();
+    Object.entries(data).forEach(([key,rx])=>{
+      // Only show emojis from OTHERS (mine already shown locally)
+      // and only if recent and not already shown
+      if(!shownReactKeys.has(key)&&now-rx.ts<4000&&rx.name!==MY_NAME){
+        shownReactKeys.add(key);
+        floatEmoji(rx.emoji,rx.name);
+      }
+    });
+    // Clean old keys
+    if(shownReactKeys.size>50) shownReactKeys=new Set();
+  });
+}
+function floatEmoji(emoji,name){
+  const el=document.createElement('div');el.className='float-emoji';
+  el.innerHTML=`<span>${emoji}</span>${name?`<span class="fe-label">${name}</span>`:''}`;
+  el.style.left=(Math.random()*55+20)+'vw';el.style.bottom='80px';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
+}
+async function sendEmoji(emoji){
+  if(emojiBlocked) return;
+  if(!checkEmojiRate()) return;
+  // Show locally immediately — just once
+  floatEmoji(emoji,MY_NAME);
+  // Push to Firebase for others — with unique key to prevent duplicates
+  try{
+    await set(push(R(`rooms/${ROOM}/reactions`)),{emoji,name:MY_NAME,ts:Date.now()});
+  }catch(e){}
+}
+window.sendEmoji=sendEmoji;
+function toggleReact(){document.getElementById('reactPanel').classList.toggle('open');}
+window.toggleReact=toggleReact;
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('reactPanel'),btn=document.getElementById('reactBtn');
+  if(panel&&btn&&!panel.contains(e.target)&&!btn.contains(e.target)) panel.classList.remove('open');
+});
+
+/* ═══════════════════════════ CONFETTI ═══════════════════════════════════ */
+function doConfetti(){
+  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
+  cv.width=innerWidth;cv.height=innerHeight;
+  const P=Array.from({length:100},()=>({x:Math.random()*cv.width,y:-10,vx:(Math.random()-.5)*5,vy:2+Math.random()*5,col:['#d4a83a','#c0392b','#1a3a6b','#2d7a4f','#f0c96a','#fff'][0|Math.random()*6],w:6+Math.random()*10,h:3+Math.random()*6,rot:Math.random()*360,vr:(Math.random()-.5)*8}));
+  let f=0;
+  (function tick(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.col;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});if(++f<200)requestAnimationFrame(tick);else ctx.clearRect(0,0,cv.width,cv.height);})();
+}
+
+/* ═══════════════════════════ RESIZE ═════════════════════════════════════ */
+/* ═══════════════════════════ MENU CARD ANIMATION ═══════════════════════════ */
+(function menuAnim(){
+  const CARDS=[
+    {txt:'A♥',cls:'r'},{txt:'2♦',cls:'r'},{txt:'3♥',cls:'r'},{txt:'4♦',cls:'r'},
+    {txt:'5♣',cls:'b'},{txt:'6♠',cls:'b'},{txt:'7♥',cls:'r'},{txt:'8♣',cls:'b'},
+    {txt:'9♦',cls:'r'},{txt:'10♠',cls:'b'},{txt:'J♥',cls:'r'},{txt:'Q♣',cls:'b'},
+    {txt:'K♦',cls:'r'},{txt:'J♠',cls:'b'},{txt:'Q♥',cls:'r'},{txt:'K♣',cls:'b'}
+  ];
+  // Starting values
+  let cur=[
+    {txt:'7♥',cls:'r'},{txt:'J♠',cls:'b'},
+    {txt:'Q♦',cls:'r'},{txt:'K♣',cls:'b'}
+  ];
+  const slots=[0,1,2,3];
+
+  function nextCard(exclude){
+    let c;
+    do{ c=CARDS[0|Math.random()*CARDS.length]; }
+    while(c.txt===exclude);
+    return c;
+  }
+
+  function animSlot(idx){
+    const el=document.getElementById('mc'+idx);
+    if(!el) return;
+    // Fade out
+    el.classList.add('fade');
+    setTimeout(()=>{
+      const next=nextCard(cur[idx].txt);
+      cur[idx]=next;
+      el.className='sc '+(next.cls)+' fade';
+      el.textContent=next.txt;
+      // Fade in
+      setTimeout(()=>el.classList.remove('fade'),30);
+    },500);
+  }
+
+  // Animate one random card every 1.8 seconds
+  setInterval(()=>{
+    const idx=0|Math.random()*4;
+    animSlot(idx);
+  },1800);
+})();
+
+window.addEventListener('resize',()=>{if(document.getElementById('sGame').classList.contains('active')){buildBoard();render();}});
+</script>
+</body>
+</html>
